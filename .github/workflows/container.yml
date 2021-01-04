@@ -36,7 +36,7 @@ jobs:
         with:
           push: true
           tags: |
-            xgcssch/DigitalstromBridge:latest
-            xgcssch/DigitalstromBridge:v0.0.1
+            xgcssch/digitalstrommqttbridge:latest
+            xgcssch/digitalstrommqttbridge:v0.0.1
           file: ./build/docker/Dockerfile
           platforms: linux/amd64,linux/arm/v7,linux/arm64
