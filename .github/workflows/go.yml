@@ -4,6 +4,8 @@ on:
   release:
     types: [published, created, edited]
   workflow_dispatch: {}
+env:
+  TARGET_NAME: DigitalstromMQTTBridge
 
 jobs:
   build:
@@ -36,42 +38,42 @@ jobs:
           GOOS: linux
         run: |
           mkdir ${{github.workspace}}/bin/
-          go build -v -o ${{github.workspace}}/bin ./...&& mv ${{github.workspace}}/bin/DigitalstromBridge ${{github.workspace}}/bin/DigitalstromBridge_Linux_amd64
+          go build -v -o ${{github.workspace}}/bin ./...&& mv ${{github.workspace}}/bin/${{env.TARGET_NAME}} ${{github.workspace}}/bin/${{env.TARGET_NAME}}_Linux_amd64
 
       - name: Upload Linux amd64
         uses: actions/upload-artifact@v2
         with:
-          name: DigitalstromBridge_Linux_amd64
+          name: ${{env.TARGET_NAME}}_Linux_amd64
           path: |
-            ${{github.workspace}}/bin/DigitalstromBridge_Linux_amd64
+            ${{github.workspace}}/bin/${{env.TARGET_NAME}}_Linux_amd64
 
       - name: Build Linux x86
         env:
           GOARCH: "386"
           GOOS: linux
         run: |
-          go build -v -o ${{github.workspace}}/bin ./...&& mv ${{github.workspace}}/bin/DigitalstromBridge ${{github.workspace}}/bin/DigitalstromBridge_Linux_x86
+          go build -v -o ${{github.workspace}}/bin ./...&& mv ${{github.workspace}}/bin/${{env.TARGET_NAME}} ${{github.workspace}}/bin/${{env.TARGET_NAME}}_Linux_x86
 
       - name: Upload Linux x86
         uses: actions/upload-artifact@v2
         with:
-          name: DigitalstromBridge_Linux_x86
+          name: ${{env.TARGET_NAME}}_Linux_x86
           path: |
-            ${{github.workspace}}/bin/DigitalstromBridge_Linux_x86
+            ${{github.workspace}}/bin/${{env.TARGET_NAME}}_Linux_x86
 
       - name: Build Linux arm
         env:
           GOARCH: arm
           GOOS: linux
         run: |
-          go build -v -o ${{github.workspace}}/bin ./...&& mv ${{github.workspace}}/bin/DigitalstromBridge ${{github.workspace}}/bin/DigitalstromBridge_Linux_arm
+          go build -v -o ${{github.workspace}}/bin ./...&& mv ${{github.workspace}}/bin/${{env.TARGET_NAME}} ${{github.workspace}}/bin/${{env.TARGET_NAME}}_Linux_arm
 
       - name: Upload Linux arm
         uses: actions/upload-artifact@v2
         with:
-          name: DigitalstromBridge_Linux_arm
+          name: ${{env.TARGET_NAME}}_Linux_arm
           path: |
-            ${{github.workspace}}/bin/DigitalstromBridge_Linux_arm
+            ${{github.workspace}}/bin/${{env.TARGET_NAME}}_Linux_arm
 
       - name: Build Windows x64
         env:
@@ -83,6 +85,6 @@ jobs:
       - name: Upload Windows x64
         uses: actions/upload-artifact@v2
         with:
-          name: DigitalstromBridge_Windows_x64.exe
+          name: ${{env.TARGET_NAME}}_Windows_x64.exe
           path: |
-            ${{github.workspace}}/bin/DigitalstromBridge.exe
+            ${{github.workspace}}/bin/${{env.TARGET_NAME}}.exe
