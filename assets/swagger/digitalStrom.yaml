@@ -1,0 +1,1145 @@
+swagger: "2.0"
+info:
+  description: "dSS Server JSON Interface"
+  version: "1.0.0"
+  title: "dSS API"
+  termsOfService: "http://swagger.io/terms/"
+  contact:
+    email: "apiteam@swagger.io"
+  license:
+    name: "Apache 2.0"
+    url: "http://www.apache.org/licenses/LICENSE-2.0.html"
+host: "dss.int.schau.org:8080"
+basePath: "/json"
+tags:
+- name: "System"
+  description: "dSS System information"
+  externalDocs:
+    description: "Find out more"
+    url: "http://swagger.io"
+- name: "Authentication"
+  description: "dSS Authentication"
+- name: "Property"
+  description: "Access to the property tree"
+- name: "Apartment"
+  description: "Access to items in the apartment"
+- name: "Zone"
+  description: "Access to items a specific zone"
+- name: "Device"
+  description: "Access to individual devices"
+- name: "Event"
+  description: "Access to the event system"
+schemes:
+- "https"
+securityDefinitions:
+ api_key:
+   type: "apiKey"
+   name: "token"
+   in: query
+externalDocs:
+  description: "Find out more about Swagger"
+  url: "http://swagger.io"
+paths:
+  /event/subscribe:
+    get:
+      security:
+        - api_key: []
+      tags:
+      - "Event"
+      summary: "Subscribe to an event with the given name and registers the callers subscriptionId. A unique subscriptionId
+can be selected by the subscriber. It is possible to subscribe to several events reusing the same
+subscriptionId."
+      operationId: "subscribe"
+      produces:
+      - "application/json"
+      parameters:
+        - in: query
+          name: name
+          required: true
+          type: string
+          description: "identifier string for the event"
+        - in: query
+          name: subscriptionID
+          required: true
+          type: integer
+          description: "numerical unique value"
+      responses:
+        "200":
+          description: "successfully subscribed"
+          schema:
+            type: "object"
+            properties:
+              ok:
+                type: "boolean"
+  /event/unsubscribe:
+    get:
+      security:
+        - api_key: []
+      tags:
+      - "Event"
+      summary: "Unsubscribes for the previously registered events by giving the event name and the unique subscriptionId."
+      operationId: "unsubscribe"
+      produces:
+      - "application/json"
+      parameters:
+        - in: query
+          name: name
+          required: true
+          type: string
+          description: "identifier string for the event"
+        - in: query
+          name: subscriptionID
+          required: true
+          type: integer
+          description: "numerical unique value"
+      responses:
+        "200":
+          description: "successfully unsubscribed"
+          schema:
+            type: "object"
+            properties:
+              ok:
+                type: "boolean"
+  /event/get:
+    get:
+      security:
+        - api_key: []
+      tags:
+      - "Event"
+      summary: "Get event and context information for an event subscription. All events subscribed with the given Id will
+be handled by this call. An optional timeout value in milliseconds can be specified and will block the
+call until either an event or the timeout occurs. If the timeout value is zero or missing the call will not
+timeout."
+      operationId: "get"
+      produces:
+      - "application/json"
+      parameters:
+        - in: query
+          name: subscriptionID
+          required: true
+          type: integer
+          description: "numerical unique value"
+        - in: query
+          name: timeout
+          required: false
+          type: integer
+          description: "numerical unique value"
+      responses:
+        "200":
+          description: "successfully received events"
+          schema:
+            type: "object"
+            properties:
+              ok:
+                type: "boolean"
+              result:
+                type: object
+                properties:
+                    events:
+                      type: "array"
+                      items:
+                        type: "object"
+                        properties:
+                          name:
+                            type: string
+                          properties:
+                            type: object
+                            properties:
+                              callOrigin:
+                                type: string
+                              groupID:
+                                type: string
+                              sceneID:
+                                type: string
+                              zoneID:
+                                type: string
+                              originDSUID:
+                                type: string
+                              originToken:
+                                type: string
+                              buttonIndex:
+                                type: string
+                              clickType:
+                                type: string
+                          source:
+                            type: object
+                            properties:
+                              set:
+                                type: string
+                              dsid:
+                                type: string
+                              groupID:
+                                type: integer
+                              zoneID:
+                                type: integer
+                              isApartment:
+                                type: boolean
+                              isGroup:
+                                type: boolean
+                              isDevice:
+                                type: boolean
+  /device/turnOn:
+    get:
+      security:
+        - api_key: []
+      tags:
+      - "Device"
+      summary: "Tells devices to execute the scene MAX."
+      operationId: "turnOn"
+      produces:
+      - "application/json"
+      parameters:
+        - in: query
+          name: dsid
+          required: true
+          type: string
+          description: "dsid of the device"
+      responses:
+        "200":
+          description: "successfully set MAX"
+          schema:
+            type: "object"
+            properties:
+              ok:
+                type: "boolean"
+  /device/turnOff:
+    get:
+      security:
+        - api_key: []
+      tags:
+      - "Device"
+      summary: "Tells devices to execute the scene MIN."
+      operationId: "turnOff"
+      produces:
+      - "application/json"
+      parameters:
+        - in: query
+          name: dsid
+          required: true
+          type: string
+          description: "dsid of the device"
+      responses:
+        "200":
+          description: "successfully set MIN"
+          schema:
+            type: "object"
+            properties:
+              ok:
+                type: "boolean"
+  /device/increaseValue:
+    get:
+      security:
+        - api_key: []
+      tags:
+      - "Device"
+      summary: "Tells devices to execute the scene INC."
+      operationId: "increaseValue"
+      produces:
+      - "application/json"
+      parameters:
+        - in: query
+          name: dsid
+          type: string
+          required: true
+          description: "dsid of the device"
+      responses:
+        "200":
+          description: "successfully increased value"
+          schema:
+            type: "object"
+            properties:
+              ok:
+                type: "boolean"
+  /device/decreaseValue:
+    get:
+      security:
+        - api_key: []
+      tags:
+      - "Device"
+      summary: "Tells devices to execute the scene DEC."
+      operationId: "decreaseValue"
+      produces:
+      - "application/json"
+      parameters:
+        - in: query
+          name: dsid
+          required: true
+          type: string
+          description: "dsid of the device"
+      responses:
+        "200":
+          description: "successfully decreased value"
+          schema:
+            type: "object"
+            properties:
+              ok:
+                type: "boolean"
+  /apartment/setValue:
+    get:
+      security:
+        - api_key: []
+      tags:
+      - "Apartment"
+      summary: "Set the output value of a group of devices to a given value."
+      operationId: "setValue"
+      produces:
+      - "application/json"
+      parameters:
+        - in: query
+          name: value
+          type: integer
+          required: true
+          description: "Numerical value"
+        - in: query
+          name: groupID
+          type: integer
+          description: "Number of the target group"
+        - in: query
+          name: groupName
+          type: string
+          description: "Name of the target group"
+      responses:
+        "200":
+          description: "successfully set value"
+          schema:
+            type: "object"
+            properties:
+              ok:
+                type: "boolean"
+  /apartment/callScene:
+    get:
+      security:
+        - api_key: []
+      tags:
+      - "Apartment"
+      summary: "Excutes the scene sceneNumber on a group of devices."
+      operationId: "ApartmentCallScene"
+      produces:
+      - "application/json"
+      parameters:
+        - in: query
+          name: sceneNumber
+          type: integer
+          required: true
+          description: "Numerical value"
+        - in: query
+          name: groupID
+          type: integer
+          description: "Number of the target group"
+        - in: query
+          name: groupName
+          type: string
+          description: "Name of the target group"
+        - in: query
+          name: force
+          type: boolean
+          description: "Boolean value, if set a forced scene call is issued"
+      responses:
+        "200":
+          description: "successfully set value"
+          schema:
+            type: "object"
+            properties:
+              ok:
+                type: "boolean"
+  /apartment/getStructure:
+    get:
+      security:
+        - api_key: []
+      tags:
+      - "Apartment"
+      summary: "Returns an object containing the structure of the apartment. This includes detailed information about
+all zones, groups and devices."
+      operationId: "getStructure"
+      produces:
+      - "application/json"
+      parameters: []
+      responses:
+        "200":
+          description: "successfully retrieved Structure"
+          schema:
+            type: "object"
+            properties:
+              ok:
+                type: "boolean"
+              result:
+                type: object
+                properties:
+                  apartment:
+                    type: object
+                    properties:
+                      clusters:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            id:
+                              type: integer
+                            name:
+                              type: string
+                            devices:
+                              type: array
+                              items:
+                                type: string
+                      floors:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            id:
+                              type: integer
+                            name:
+                              type: string
+                            zones:
+                              type: array
+                              items:
+                                type: integer
+                      zones:
+                        type: "array"
+                        items:
+                          type: "object"
+                          properties:
+                            id:
+                              type: integer
+                            name:
+                              type: string
+                            isPresent:
+                              type: boolean
+                            floorId:
+                              type: integer
+                            devices:
+                              type: array
+                              items:
+                                type: object
+                                properties:
+                                  id:
+                                    type: string
+                                  DisplayID:
+                                    type: string
+                                  dSUID:
+                                    type: string
+                                  name:
+                                    type: string
+                                  groups:
+                                    type: array
+                                    items:
+                                      type: integer
+                                  sensors:
+                                    type: array
+                                    items:
+                                      type: object
+                                      properties:
+                                        type:
+                                          type: integer
+                                        valid:
+                                          type: boolean
+                                        value:
+                                          type: number
+                                          format: double
+                                  outputChannels:
+                                    type: array
+                                    items:
+                                      type: object
+                                      properties:
+                                        channelId:
+                                          type: string
+                                        channelType:
+                                          type: string
+                                        channelIndex:
+                                          type: integer
+                                        channelName:
+                                          type: string
+                            groups:
+                              type: array
+                              items:
+                                type: object
+                                properties:
+                                  id:
+                                    type: string
+                                  name:
+                                    type: string
+                                  applicationType:
+                                    type: integer
+                                  devices:
+                                    type: array
+                                    items:
+                                      type: string
+  /zone/callScene:
+    get:
+      security:
+        - api_key: []
+      tags:
+      - "Zone"
+      summary: "Excutes the scene sceneNumber in a zone for a group of devices."
+      operationId: "ZoneCallScene"
+      produces:
+      - "application/json"
+      parameters:
+        - in: query
+          name: sceneNumber
+          type: integer
+          required: true
+          description: "Numerical value"
+        - in: query
+          name: id
+          type: integer
+          description: "Number of the target zone"
+        - in: query
+          name: groupID
+          type: integer
+          description: "Number of the target group"
+        - in: query
+          name: groupName
+          type: string
+          description: "Name of the target group"
+        - in: query
+          name: force
+          type: boolean
+          description: "Boolean value, if set a forced scene call is issued"
+      responses:
+        "200":
+          description: "successfully set value"
+          schema:
+            type: "object"
+            properties:
+              ok:
+                type: "boolean"
+  /system/version:
+    get:
+      tags:
+      - "System"
+      summary: "Gets the server version information"
+      description: ""
+      operationId: "version"
+      produces:
+      - "application/json"
+      responses:
+        "200":
+          description: "successful operation"
+          schema:
+            type: "object"
+            properties:
+              ok:
+                type: "boolean"
+              result:
+                type: "object"
+                properties:
+                  version:
+                    description: "the dSS application version"
+                    type: "string"
+                  distroVersion:
+                    description: "the host platform firmware release (since v1.10)"
+                    type: "string"
+                  Hardware:
+                    description: "the host platform hardware identifier (since v1.10)"
+                    type: "string"
+                  Revision:
+                    description: "the host platform hardware revision number (since v1.10)"
+                    type: "string"
+                  Serial:
+                    description: "the host platform hardware serial number (since v1.10)"
+                    type: "string"
+                  Ethernet:
+                    description: "the host platform IEEE Mac address (since v1.10)"
+                    type: "string"
+                  MachineID:
+                    description: "the host system unique id (since v1.10)"
+                    type: "string"
+                  Kernel:
+                    description: "the host system Linux kernel release string (since v1.10)"
+                    type: "string"
+  /system/time:
+    get:
+      tags:
+      - "System"
+      summary: "Gets the installation time"
+      description: ""
+      operationId: "time"
+      produces:
+      - "application/json"
+      responses:
+        "200":
+          description: "successful operation"
+          schema:
+            type: "object"
+            properties:
+              ok:
+                type: "boolean"
+              result:
+                type: "object"
+                properties:
+                  time:
+                    description: "number of seconds since the Epoch, 1970-01-01 00:00:00 +0000 (UTC)"
+                    type: "integer"
+                    format: "int64"
+                  offset:
+                    description: "offset in seconds east to GMT"
+                    type: "integer"
+                    format: "int64"
+                  daylight:
+                    description: "boolean flag indicating if daylight saving is currently active"
+                    type: "boolean"
+                  timezone:
+                    description: "timezone description string"
+                    type: "string"
+  /system/getDSID:
+    get:
+      tags:
+      - "System"
+      summary: "Returns the dSUID and dSID of the digitalSTROM Server."
+      operationId: "getDSID"
+      produces:
+      - "application/json"
+      responses:
+        "200":
+          description: "successful operation"
+          schema:
+            type: "object"
+            properties:
+              ok:
+                type: "boolean"
+              result:
+                type: "object"
+                properties:
+                  dSID:
+                    description: "dSID = SGTIN-96 of the dSS"
+                    type: "string"
+                  dSUID:
+                    description: "dSUID of the dSS"
+                    type: "string"
+  /system/login:
+    get:
+      tags:
+      - "Authentication"
+      summary: "Creates a new session using the provided credentials."
+      operationId: "login"
+      produces:
+      - "application/json"
+      parameters:
+        - in: query
+          name: user
+          type: string
+          required: true
+          description: "user name string"
+        - in: query
+          name: password
+          type: string
+          required: true
+          description: "password string"
+      responses:
+        "200":
+          description: "successful login"
+          schema:
+            type: "object"
+            properties:
+              ok:
+                type: "boolean"
+              result:
+                type: "object"
+                properties:
+                  token:
+                    description: "session token as string"
+                    type: "string"
+  /system/logout:
+    get:
+      security:
+        - api_key: []
+      tags:
+      - "Authentication"
+      summary: "Destroys the session and signs out the user."
+      operationId: "logout"
+      responses:
+        "200":
+          description: "successfuly logged out"
+          schema:
+            type: "object"
+            properties:
+              ok:
+                type: "boolean"
+  /system/loggedInUser:
+    get:
+      security:
+        - api_key: []
+      tags:
+      - "Authentication"
+      summary: "Returns the name of the currently logged in user."
+      operationId: "loggedInUser"
+      responses:
+        "200":
+          description: "successfuly logged out"
+          schema:
+            type: "object"
+            properties:
+              ok:
+                type: "boolean"
+              result:
+                type: "object"
+                properties:
+                  name:
+                    description: "name of the currently logged in user"
+                    type: "string"
+  /system/requestApplicationToken:
+    get:
+      tags:
+      - "Authentication"
+      summary: "Creates a new session using the provided credentials."
+      operationId: "requestApplicationToken"
+      produces:
+      - "application/json"
+      parameters:
+        - in: query
+          name: applicationName
+          type: string
+          required: true
+          description: "name of the application that requests the token"
+      responses:
+        "200":
+          description: "successful token generated"
+          schema:
+            type: "object"
+            properties:
+              ok:
+                type: "boolean"
+              result:
+                type: "object"
+                properties:
+                  applicationToken:
+                    description: "application token as string"
+                    type: "string"
+  /system/enableToken:
+    get:
+      security:
+        - api_key: []
+      tags:
+      - "Authentication"
+      summary: "Enables an application token, caller must be logged in."
+      operationId: "enableToken"
+      parameters:
+        - in: query
+          name: applicationToken
+          type: string
+          required: true
+          description: "application token as string"
+      responses:
+        "200":
+          description: "successfuly enabled token"
+          schema:
+            type: "object"
+            properties:
+              ok:
+                type: "boolean"
+  /system/revokeToken:
+    get:
+      security:
+        - api_key: []
+      tags:
+      - "Authentication"
+      summary: "Revokes an application token, caller must be logged in."
+      operationId: "revokeToken"
+      parameters:
+        - in: query
+          name: applicationToken
+          type: string
+          required: true
+          description: "application token as string"
+      responses:
+        "200":
+          description: "successfuly revoked token"
+          schema:
+            type: "object"
+            properties:
+              ok:
+                type: "boolean"
+  /system/loginApplication:
+    get:
+      tags:
+      - "Authentication"
+      summary: "Creates a new session using the registered application token."
+      operationId: "loginApplication"
+      produces:
+      - "application/json"
+      parameters:
+        - in: query
+          name: loginToken
+          type: string
+          required: true
+          description: "application token as string"
+      responses:
+        "200":
+          description: "successful login"
+          schema:
+            type: "object"
+            properties:
+              ok:
+                type: "boolean"
+              result:
+                type: "object"
+                properties:
+                  token:
+                    description: "session token as string"
+                    type: "string"
+  /property/getString:
+    get:
+      security:
+        - api_key: []
+      tags:
+      - "Property"
+      summary: "Returns the string value of the property, this call will fail if the property is not of type ’string’."
+      operationId: "getString"
+      produces:
+      - "application/json"
+      parameters:
+        - in: query
+          name: path
+          type: string
+          required: true
+          description: "path of the property"
+      responses:
+        "200":
+          description: "successfully retrieved string"
+          schema:
+            type: "object"
+            properties:
+              ok:
+                type: "boolean"
+              result:
+                type: "object"
+                properties:
+                  value:
+                    description: "string value of the property"
+                    type: "string"
+  /property/setString:
+    get:
+      security:
+        - api_key: []
+      tags:
+      - "Property"
+      summary: "Sets the string value of the property, this call will fail if the property is not of type ’string’."
+      operationId: "setString"
+      produces:
+      - "application/json"
+      parameters:
+        - in: query
+          name: path
+          type: string
+          required: true
+          description: "path of the property"
+        - in: query
+          name: value
+          type: string
+          required: true
+          description: "string value to set"
+      responses:
+        "200":
+          description: "successfully set string"
+          schema:
+            type: "object"
+            properties:
+              ok:
+                type: "boolean"
+  /property/getInteger:
+    get:
+      security:
+        - api_key: []
+      tags:
+      - "Property"
+      summary: "Returns the integer value of the property, this call will fail if the property is not of type ’integer’."
+      operationId: "getInteger"
+      produces:
+      - "application/json"
+      parameters:
+        - in: query
+          name: path
+          type: string
+          required: true
+          description: "path of the property"
+      responses:
+        "200":
+          description: "successfully retrieved integer"
+          schema:
+            type: "object"
+            properties:
+              ok:
+                type: "boolean"
+              result:
+                type: "object"
+                properties:
+                  value:
+                    description: "integer value of the property"
+                    type: "integer"
+  /property/setInteger:
+    get:
+      security:
+        - api_key: []
+      tags:
+      - "Property"
+      summary: "Sets the integer value of the property, this call will fail if the property is not of type ’integer’."
+      operationId: "setInteger"
+      produces:
+      - "application/json"
+      parameters:
+        - in: query
+          name: path
+          type: string
+          required: true
+          description: "path of the property"
+        - in: query
+          name: value
+          type: integer
+          required: true
+          description: "integer value to set"
+      responses:
+        "200":
+          description: "successfully set integer"
+          schema:
+            type: "object"
+            properties:
+              ok:
+                type: "boolean"
+  /property/getBoolean:
+    get:
+      security:
+        - api_key: []
+      tags:
+      - "Property"
+      summary: "Returns the boolean value of the property, this call will fail if the property is not of type ’boolean’."
+      operationId: "getBoolean"
+      produces:
+      - "application/json"
+      parameters:
+        - in: query
+          name: path
+          type: string
+          required: true
+          description: "path of the property"
+      responses:
+        "200":
+          description: "successfully retrieved boolean"
+          schema:
+            type: "object"
+            properties:
+              ok:
+                type: "boolean"
+              result:
+                type: "object"
+                properties:
+                  value:
+                    description: "boolean value of the property"
+                    type: "boolean"
+  /property/setBoolean:
+    get:
+      security:
+        - api_key: []
+      tags:
+      - "Property"
+      summary: "Sets the boolean value of the property, this call will fail if the property is not of type ’boolean’."
+      operationId: "setBoolean"
+      produces:
+      - "application/json"
+      parameters:
+        - in: query
+          name: path
+          type: string
+          required: true
+          description: "path of the property"
+        - in: query
+          name: value
+          type: boolean
+          required: true
+          description: "boolean value to set"
+      responses:
+        "200":
+          description: "successfully set boolean"
+          schema:
+            type: "object"
+            properties:
+              ok:
+                type: "boolean"
+  /property/getChildren:
+    get:
+      security:
+        - api_key: []
+      tags:
+      - "Property"
+      summary: "Returns an array of child nodes."
+      operationId: "getChildren"
+      produces:
+      - "application/json"
+      parameters:
+        - in: query
+          name: path
+          type: string
+          required: true
+          description: "path of the property"
+      responses:
+        "200":
+          description: "successfully retrieved string"
+          schema:
+            type: "object"
+            properties:
+              ok:
+                type: "boolean"
+              result:
+                type: "array"
+                items:
+                  type: object
+                  properties:
+                    name:
+                      description: "name of the childnode"
+                      type: "string"
+                    type:
+                      description: "type of the childnode"
+                      type: "string"
+  /property/getType:
+    get:
+      security:
+        - api_key: []
+      tags:
+      - "Property"
+      summary: "Returns the type of the property, this can be “none”, “string”, “integer” or “boolean”."
+      operationId: "getType"
+      produces:
+      - "application/json"
+      parameters:
+        - in: query
+          name: path
+          type: string
+          required: true
+          description: "path of the property"
+      responses:
+        "200":
+          description: "successfully retrieved type"
+          schema:
+            type: "object"
+            properties:
+              ok:
+                type: "boolean"
+              result:
+                type: "object"
+                properties:
+                  type:
+                    description: "type of the property"
+                    type: "string"
+  /property/getFlags:
+    get:
+      security:
+        - api_key: []
+      tags:
+      - "Property"
+      summary: "Returns the flag values of a property."
+      operationId: "getFlags"
+      produces:
+      - "application/json"
+      parameters:
+        - in: query
+          name: path
+          type: string
+          required: true
+          description: "path of the property"
+      responses:
+        "200":
+          description: "successfully retrieved flags"
+          schema:
+            type: "object"
+            properties:
+              ok:
+                type: "boolean"
+              result:
+                type: "object"
+                properties:
+                  READABLE:
+                    description: "information about the READABLE flag"
+                    type: "boolean"
+                  WRITEABLE:
+                    description: "information about the WRITEABLE flag"
+                    type: "boolean"
+                  ARCHIVE:
+                    description: "information about the ARCHIVE flag"
+                    type: "boolean"
+  /property/setFlags:
+    get:
+      security:
+        - api_key: []
+      tags:
+      - "Property"
+      summary: "Sets a given flag of a property."
+      operationId: "setFlags"
+      produces:
+      - "application/json"
+      parameters:
+        - in: query
+          name: path
+          type: string
+          required: true
+          description: "path of the property"
+        - in: query
+          name: flag
+          type: string
+          required: true
+          description: "flag identifier"
+          enum: [READABLE, WRITEABLE, ARCHIVE]
+        - in: query
+          name: value
+          type: boolean
+          required: true
+          description: "boolean flag value"
+      responses:
+        "200":
+          description: "successfully set boolean"
+          schema:
+            type: "object"
+            properties:
+              ok:
+                type: "boolean"
+  /property/remove:
+    get:
+      security:
+        - api_key: []
+      tags:
+      - "Property"
+      summary: "Removes a property node."
+      operationId: "remove"
+      produces:
+      - "application/json"
+      parameters:
+        - in: query
+          name: path
+          type: string
+          required: true
+          description: "path of the property"
+      responses:
+        "200":
+          description: "successfully removed property"
+          schema:
+            type: "object"
+            properties:
+              ok:
+                type: "boolean"
+  /property/query2:
+    get:
+      security:
+        - api_key: []
+      tags:
+      - "Property"
+      summary: "Returns a part of the tree specified by query."
+      operationId: "query2"
+      description: "All queries start from the root. The properties to be included have to be put in parentheses. A query to get all device from zone4 would look like this: ’/apartment/ zones/zone4/*(ZoneID,name)’. More complex combinations (see example below) are also possible."
+      produces:
+      - "application/json"
+      parameters:
+        - in: query
+          name: query
+          type: string
+          required: true
+          description: "query string"
+      responses:
+        "200":
+          description: "successfully executed query"
+          schema:
+            type: "object"
+            properties:
+              ok:
+                type: "boolean"
+              result:
+                type: object
+                additionalProperties: true
