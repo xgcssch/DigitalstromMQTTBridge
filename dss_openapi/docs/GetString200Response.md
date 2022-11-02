@@ -1,0 +1,12 @@
+# GetString200Response
+
+## Properties
+
+Name | Type | Description | Notes
+------------ | ------------- | ------------- | -------------
+**ok** | Option<**bool**> |  | [optional]
+**result** | Option<[**crate::models::GetString200ResponseResult**](getString_200_response_result.md)> |  | [optional]
+
+[[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
+
+

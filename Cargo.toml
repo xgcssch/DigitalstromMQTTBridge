@@ -1,2 +1,2 @@
 [workspace]
-members = ["dss_interface", "digitalstrom_mqttbridge"]
+members = ["dss_interface", "dss_openapi", "digitalstrom_mqttbridge"]
