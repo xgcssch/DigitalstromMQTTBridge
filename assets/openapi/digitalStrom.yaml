@@ -12,7 +12,7 @@ externalDocs:
   description: dSS Json API Documentation
   url: http://developer.digitalstrom.org/Architecture/v1.6/system-json/dss-json.pdf
 servers:
-  - url: https://dss.int.schau.org:8080/json
+  - url: https://dss.acme.com:8080/json
 tags:
   - name: System
     description: dSS System information

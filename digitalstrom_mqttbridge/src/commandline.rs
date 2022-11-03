@@ -1,25 +1,32 @@
 use clap::{Parser, Subcommand, ValueEnum};
-use std::path::PathBuf;
 
 #[derive(Parser)]
 #[command(author, version, about, long_about = None)]
 pub struct Cli {
-    /// Optional name to operate on
-    name: Option<String>,
+    #[arg(short, long)]
+    /// Url of dSS Server including protocol an optional port
+    pub url: String,
 
-    #[arg(short, long, value_enum, value_name = "FMT")]
-    pub message_format: Option<Messageformat>,
+    /// Format of log output
+    #[arg(
+        short,
+        long,
+        value_enum,
+        value_name = "FMT",
+        default_value_t = Messageformat::Simple
+    )]
+    pub message_format: Messageformat,
 
     /// Sets a custom config file
-    #[arg(short, long, value_name = "FILE")]
-    config: Option<PathBuf>,
+    //#[arg(short, long, value_name = "FILE")]
+    //config: Option<PathBuf>,
 
     /// Turn debugging information on
     #[arg(short, long, action = clap::ArgAction::Count)]
-    debug: u8,
+    pub debug: u8,
 
     #[command(subcommand)]
-    command: Option<Commands>,
+    pub command: Commands,
 }
 
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, ValueEnum)]
@@ -32,10 +39,10 @@ pub enum Messageformat {
 
 #[derive(Subcommand)]
 pub enum Commands {
-    /// does testing things
-    Test {
-        /// lists test values
-        #[arg(short, long)]
-        list: bool,
+    /// Requests an Authentication Token from the dSS
+    RequestApplicationToken {
+        /// Application name. Will show up in the dSS UI
+        #[arg(short, long, default_value_t = String::from("MQTT Bridge"))]
+        application_name: String,
     },
 }

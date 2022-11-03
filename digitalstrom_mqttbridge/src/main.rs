@@ -8,7 +8,7 @@ extern crate slog;
 extern crate slog_async;
 extern crate slog_term;
 
-use slog::{info, o, Drain};
+use slog::{error, info, o, Drain};
 
 use crate::commandline::{Cli, Messageformat};
 use clap::Parser;
@@ -29,7 +29,7 @@ async fn main() {
     let cli = Cli::parse();
 
     let d: Option<slog::Logger>;
-    match cli.message_format.unwrap_or(Messageformat::Simple) {
+    match cli.message_format {
         Messageformat::Json => {
             let drain = slog_json::Json::default(std::io::stderr()).fuse();
             let drain = slog_async::Async::new(drain).build().fuse();
@@ -61,6 +61,7 @@ async fn main() {
         log: d.unwrap(),
         configuration: dss_openapi::apis::configuration::Configuration {
             client: dss_client,
+            base_path: cli.url,
             ..dss_openapi::apis::configuration::Configuration::default()
         },
     };
@@ -78,8 +79,47 @@ async fn main() {
         "eventid" => 1
     );
 
-    let result = dss_openapi::apis::system_api::get_dsid(&context.configuration)
-        .await
-        .unwrap();
-    println!("Response: {:?}", result.ok.ok_or(false));
+    match &cli.command {
+        crate::commandline::Commands::RequestApplicationToken { application_name } => {
+            let result = dss_openapi::apis::authentication_api::request_application_token(
+                &context.configuration,
+                application_name,
+            )
+            .await;
+            match result {
+                Ok(response) => {
+                    if !response.ok.unwrap_or(false) {
+                        error!(
+                            context.log,
+                            "request_application_token request succeeded but returned ok=false"
+                            ;
+                            "eventid" => 4
+                        );
+                    } else {
+                        let application_token = response.result.unwrap().application_token.unwrap();
+                        info!(
+                            context.log,
+                            "retrieved token '{application_token}'",
+                            ;
+                            "eventid" => 3,"application_token"=>application_token.clone()
+                        );
+                    }
+                }
+                Err(error) => {
+                    error!(
+                        context.log,
+                        "request_application_token request failed"
+                        ;
+                        "eventid" => 2,
+                        "error"=>%error
+                    );
+                }
+            }
+        }
+    }
+
+    //let result = dss_openapi::apis::system_api::get_dsid(&context.configuration)
+    //    .await
+    //    .unwrap();
+    //println!("Response: {:?}", result.ok.ok_or(false));
 }
