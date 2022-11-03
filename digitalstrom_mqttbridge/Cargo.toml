@@ -9,5 +9,13 @@ edition = "2021"
 dss_interface = { path = "../dss_interface" }
 dss_openapi = { path = "../dss_openapi" }
 
+clap = {version="4.0.16",features=["default","cargo","unstable-doc"]}
 tokio = {version="1.21.2",features=["full"]}
 reqwest={version="0.11.12"}
+rumqttc = "0.17.0"
+chrono="0.4.22"
+slog="2.7.0"
+slog-term="2.9.0"
+slog-async="2.7.0"
+slog-json="2.6.1"
+slog_unwraps="0.1.5"
