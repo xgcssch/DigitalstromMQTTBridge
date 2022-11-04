@@ -1,9 +1,21 @@
 # DigitalstromMQTTBridge
 Bridge Digitalstrom devices to MQTT and generate Data for Prometheus
 # dSS JsonApi
-``
+```
 docker run --rm -p 80:8080 swaggerapi/swagger-editor
-``
+```
+## Generate OpenApi Rust client
+```
+$ cd DigitalstromMQTTBridge
+docker run --rm \
+  -v "$(pwd):/local"  \
+  --user $(id -u):$(id -g)  \
+  openapitools/openapi-generator-cli generate \
+    -i /local/assets/openapi/digitalStrom.yaml \
+    -g rust \
+    -o /local/dss_openapi \
+    -p packageName=dss_openapi
+```
 # Debug with Burp Suite
 To explore the JSON Communication between the MQTTBridge or any other Program using this interface (e. g. Digitalstrom App) and the dSS you can use the [[Burp Suite]](asdf)
 - Start Burp
