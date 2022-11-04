@@ -12,21 +12,18 @@
 
 
 #[derive(Clone, Debug, PartialEq, Default, Serialize, Deserialize)]
-pub struct RequestApplicationToken200Response {
+pub struct Status {
     #[serde(rename = "ok")]
     pub ok: bool,
     #[serde(rename = "message", skip_serializing_if = "Option::is_none")]
     pub message: Option<String>,
-    #[serde(rename = "result", skip_serializing_if = "Option::is_none")]
-    pub result: Option<Box<crate::models::RequestApplicationToken200ResponseAllOfResult>>,
 }
 
-impl RequestApplicationToken200Response {
-    pub fn new(ok: bool) -> RequestApplicationToken200Response {
-        RequestApplicationToken200Response {
+impl Status {
+    pub fn new(ok: bool) -> Status {
+        Status {
             ok,
             message: None,
-            result: None,
         }
     }
 }

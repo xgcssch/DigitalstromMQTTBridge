@@ -18,6 +18,10 @@ struct Context {
     configuration: dss_openapi::apis::configuration::Configuration,
 }
 
+//enum Messages {
+//    E0001,
+//}
+
 #[tokio::main]
 async fn main() {
     let cargo_pkg_name = env!("CARGO_PKG_NAME");
@@ -80,6 +84,10 @@ async fn main() {
     );
 
     match &cli.command {
+        crate::commandline::Commands::Run {
+            mqttserver,
+            application_token,
+        } => {}
         crate::commandline::Commands::RequestApplicationToken { application_name } => {
             let result = dss_openapi::apis::authentication_api::request_application_token(
                 &context.configuration,
@@ -88,19 +96,20 @@ async fn main() {
             .await;
             match result {
                 Ok(response) => {
-                    if !response.ok.unwrap_or(false) {
+                    if !response.ok {
                         error!(
                             context.log,
-                            "request_application_token request succeeded but returned ok=false"
-                            ;
+                            "outcome was not ok";
+                            "api" => "request_application_token",
+                            "message" => response.message.unwrap_or(String::from("<unknown>")),
                             "eventid" => 4
                         );
                     } else {
-                        let application_token = response.result.unwrap().application_token.unwrap();
+                        let application_token = response.result.unwrap().application_token;
                         info!(
                             context.log,
-                            "retrieved token '{application_token}'",
-                            ;
+                            "retrieved token '{application_token}'",;
+                            "api" => "request_application_token",
                             "eventid" => 3,"application_token"=>application_token.clone()
                         );
                     }

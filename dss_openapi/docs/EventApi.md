@@ -1,6 +1,6 @@
 # \EventApi
 
-All URIs are relative to *https://dss.int.schau.org:8080/json*
+All URIs are relative to *https://dss.acme.com:8080/json*
 
 Method | HTTP request | Description
 ------------- | ------------- | -------------
@@ -41,7 +41,7 @@ Name | Type | Description  | Required | Notes
 
 ## subscribe
 
-> crate::models::Subscribe200Response subscribe(name, subscription_id)
+> crate::models::Status subscribe(name, subscription_id)
 Subscribe to an event with the given name and registers the callers subscriptionId. A unique subscriptionId can be selected by the subscriber. It is possible to subscribe to several events reusing the same subscriptionId.
 
 ### Parameters
@@ -54,7 +54,7 @@ Name | Type | Description  | Required | Notes
 
 ### Return type
 
-[**crate::models::Subscribe200Response**](subscribe_200_response.md)
+[**crate::models::Status**](Status.md)
 
 ### Authorization
 
@@ -70,7 +70,7 @@ Name | Type | Description  | Required | Notes
 
 ## unsubscribe
 
-> crate::models::Subscribe200Response unsubscribe(name, subscription_id)
+> crate::models::Status unsubscribe(name, subscription_id)
 Unsubscribes for the previously registered events by giving the event name and the unique subscriptionId.
 
 ### Parameters
@@ -83,7 +83,7 @@ Name | Type | Description  | Required | Notes
 
 ### Return type
 
-[**crate::models::Subscribe200Response**](subscribe_200_response.md)
+[**crate::models::Status**](Status.md)
 
 ### Authorization
 

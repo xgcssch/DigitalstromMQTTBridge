@@ -57,10 +57,13 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  ok:
-                    type: boolean
+                $ref: "#/components/schemas/Status"
+        "403":
+          description: Invalid authentication provided
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Status"
       security:
         - api_key: []
   /event/unsubscribe:
@@ -90,10 +93,13 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  ok:
-                    type: boolean
+                $ref: "#/components/schemas/Status"
+        "403":
+          description: Invalid authentication provided
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Status"
       security:
         - api_key: []
   /event/get:
@@ -175,6 +181,12 @@ paths:
                                   type: boolean
                                 isDevice:
                                   type: boolean
+        "403":
+          description: Invalid authentication provided
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Status"
       security:
         - api_key: []
   /device/turnOn:
@@ -196,10 +208,13 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  ok:
-                    type: boolean
+                $ref: "#/components/schemas/Status"
+        "403":
+          description: Invalid authentication provided
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Status"
       security:
         - api_key: []
   /device/turnOff:
@@ -221,10 +236,13 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  ok:
-                    type: boolean
+                $ref: "#/components/schemas/Status"
+        "403":
+          description: Invalid authentication provided
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Status"
       security:
         - api_key: []
   /device/increaseValue:
@@ -246,10 +264,13 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  ok:
-                    type: boolean
+                $ref: "#/components/schemas/Status"
+        "403":
+          description: Invalid authentication provided
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Status"
       security:
         - api_key: []
   /device/decreaseValue:
@@ -271,10 +292,13 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  ok:
-                    type: boolean
+                $ref: "#/components/schemas/Status"
+        "403":
+          description: Invalid authentication provided
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Status"
       security:
         - api_key: []
   /apartment/setValue:
@@ -306,10 +330,13 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  ok:
-                    type: boolean
+                $ref: "#/components/schemas/Status"
+        "403":
+          description: Invalid authentication provided
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Status"
       security:
         - api_key: []
   /apartment/callScene:
@@ -346,10 +373,13 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  ok:
-                    type: boolean
+                $ref: "#/components/schemas/Status"
+        "403":
+          description: Invalid authentication provided
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Status"
       security:
         - api_key: []
   /apartment/getStructure:
@@ -472,6 +502,12 @@ paths:
                                         type: array
                                         items:
                                           type: string
+        "403":
+          description: Invalid authentication provided
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Status"
       security:
         - api_key: []
   /zone/callScene:
@@ -513,10 +549,13 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  ok:
-                    type: boolean
+                $ref: "#/components/schemas/Status"
+        "403":
+          description: Invalid authentication provided
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Status"
       security:
         - api_key: []
   /system/version:
@@ -570,6 +609,12 @@ paths:
                         description:
                           the host system Linux kernel release string (since
                           v1.10)
+        "403":
+          description: Invalid authentication provided
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Status"
   /system/time:
     get:
       tags:
@@ -657,16 +702,7 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  ok:
-                    type: boolean
-                  result:
-                    type: object
-                    properties:
-                      token:
-                        type: string
-                        description: session token as string
+                $ref: "#/components/schemas/SessionTokenResponse"
   /system/logout:
     get:
       tags:
@@ -677,12 +713,9 @@ paths:
         200:
           description: successfuly logged out
           content:
-            "*/*":
+            application/json:
               schema:
-                type: object
-                properties:
-                  ok:
-                    type: boolean
+                $ref: "#/components/schemas/Status"
       security:
         - api_key: []
   /system/loggedInUser:
@@ -695,7 +728,7 @@ paths:
         200:
           description: successfuly logged out
           content:
-            "*/*":
+            application/json:
               schema:
                 type: object
                 properties:
@@ -707,6 +740,12 @@ paths:
                       name:
                         type: string
                         description: name of the currently logged in user
+        "403":
+          description: Invalid authentication provided
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Status"
       security:
         - api_key: []
   /system/requestApplicationToken:
@@ -728,16 +767,17 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  ok:
-                    type: boolean
-                  result:
-                    type: object
+                allOf:
+                  - $ref: "#/components/schemas/Status"
+                  - type: object
                     properties:
-                      applicationToken:
-                        type: string
-                        description: application token as string
+                      result:
+                        type: object
+                        "required": ["applicationToken"]
+                        properties:
+                          applicationToken:
+                            type: string
+                            description: application token as string
   /system/enableToken:
     get:
       tags:
@@ -755,12 +795,15 @@ paths:
         200:
           description: successfuly enabled token
           content:
-            "*/*":
+            application/json:
               schema:
-                type: object
-                properties:
-                  ok:
-                    type: boolean
+                $ref: "#/components/schemas/Status"
+        "403":
+          description: Invalid authentication provided
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Status"
       security:
         - api_key: []
   /system/revokeToken:
@@ -780,12 +823,15 @@ paths:
         200:
           description: successfuly revoked token
           content:
-            "*/*":
+            application/json:
               schema:
-                type: object
-                properties:
-                  ok:
-                    type: boolean
+                $ref: "#/components/schemas/Status"
+        "403":
+          description: Invalid authentication provided
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Status"
       security:
         - api_key: []
   /system/loginApplication:
@@ -807,16 +853,7 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  ok:
-                    type: boolean
-                  result:
-                    type: object
-                    properties:
-                      token:
-                        type: string
-                        description: session token as string
+                $ref: "#/components/schemas/SessionTokenResponse"
   /property/getString:
     get:
       tags:
@@ -848,6 +885,12 @@ paths:
                       value:
                         type: string
                         description: string value of the property
+        "403":
+          description: Invalid authentication provided
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Status"
       security:
         - api_key: []
   /property/setString:
@@ -877,10 +920,13 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  ok:
-                    type: boolean
+                $ref: "#/components/schemas/Status"
+        "403":
+          description: Invalid authentication provided
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Status"
       security:
         - api_key: []
   /property/getInteger:
@@ -914,6 +960,12 @@ paths:
                       value:
                         type: integer
                         description: integer value of the property
+        "403":
+          description: Invalid authentication provided
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Status"
       security:
         - api_key: []
   /property/setInteger:
@@ -943,10 +995,13 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  ok:
-                    type: boolean
+                $ref: "#/components/schemas/Status"
+        "403":
+          description: Invalid authentication provided
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Status"
       security:
         - api_key: []
   /property/getBoolean:
@@ -980,6 +1035,12 @@ paths:
                       value:
                         type: boolean
                         description: boolean value of the property
+        "403":
+          description: Invalid authentication provided
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Status"
       security:
         - api_key: []
   /property/setBoolean:
@@ -1009,10 +1070,13 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  ok:
-                    type: boolean
+                $ref: "#/components/schemas/Status"
+        "403":
+          description: Invalid authentication provided
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Status"
       security:
         - api_key: []
   /property/getChildren:
@@ -1049,6 +1113,12 @@ paths:
                         type:
                           type: string
                           description: type of the childnode
+        "403":
+          description: Invalid authentication provided
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Status"
       security:
         - api_key: []
   /property/getType:
@@ -1082,6 +1152,12 @@ paths:
                       type:
                         type: string
                         description: type of the property
+        "403":
+          description: Invalid authentication provided
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Status"
       security:
         - api_key: []
   /property/getFlags:
@@ -1119,6 +1195,12 @@ paths:
                       ARCHIVE:
                         type: boolean
                         description: information about the ARCHIVE flag
+        "403":
+          description: Invalid authentication provided
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Status"
       security:
         - api_key: []
   /property/setFlags:
@@ -1156,10 +1238,13 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  ok:
-                    type: boolean
+                $ref: "#/components/schemas/Status"
+        "403":
+          description: Invalid authentication provided
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Status"
       security:
         - api_key: []
   /property/remove:
@@ -1181,10 +1266,13 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  ok:
-                    type: boolean
+                $ref: "#/components/schemas/Status"
+        "403":
+          description: Invalid authentication provided
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Status"
       security:
         - api_key: []
   /property/query2:
@@ -1218,6 +1306,12 @@ paths:
                   result:
                     type: object
                     properties: {}
+        "403":
+          description: Invalid authentication provided
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Status"
       security:
         - api_key: []
 components:
@@ -1226,3 +1320,24 @@ components:
       type: apiKey
       name: token
       in: query
+  schemas:
+    Status:
+      type: object
+      "required": ["ok"]
+      properties:
+        ok:
+          type: boolean
+        message:
+          type: string
+    SessionTokenResponse:
+      allOf:
+        - $ref: "#/components/schemas/Status"
+        - type: object
+          properties:
+            result:
+              type: object
+              "required": ["token"]
+              properties:
+                token:
+                  type: string
+                  description: session token as string

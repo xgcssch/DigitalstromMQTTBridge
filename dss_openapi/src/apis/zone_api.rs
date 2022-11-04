@@ -19,11 +19,12 @@ use super::{Error, configuration};
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(untagged)]
 pub enum ZoneCallSceneError {
+    Status403(crate::models::Status),
     UnknownValue(serde_json::Value),
 }
 
 
-pub async fn zone_call_scene(configuration: &configuration::Configuration, scene_number: i32, id: Option<i32>, group_id: Option<i32>, group_name: Option<&str>, force: Option<bool>) -> Result<crate::models::Subscribe200Response, Error<ZoneCallSceneError>> {
+pub async fn zone_call_scene(configuration: &configuration::Configuration, scene_number: i32, id: Option<i32>, group_id: Option<i32>, group_name: Option<&str>, force: Option<bool>) -> Result<crate::models::Status, Error<ZoneCallSceneError>> {
     let local_var_configuration = configuration;
 
     let local_var_client = &local_var_configuration.client;

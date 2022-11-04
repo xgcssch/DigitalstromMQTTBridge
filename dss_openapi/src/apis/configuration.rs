@@ -42,7 +42,7 @@ impl Configuration {
 impl Default for Configuration {
     fn default() -> Self {
         Configuration {
-            base_path: "https://dss.int.schau.org:8080/json".to_owned(),
+            base_path: "https://dss.acme.com:8080/json".to_owned(),
             user_agent: Some("OpenAPI-Generator/1.6.0/rust".to_owned()),
             client: reqwest::Client::new(),
             basic_auth: None,

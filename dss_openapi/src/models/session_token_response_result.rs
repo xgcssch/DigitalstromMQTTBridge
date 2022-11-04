@@ -12,16 +12,16 @@
 
 
 #[derive(Clone, Debug, PartialEq, Default, Serialize, Deserialize)]
-pub struct Login200ResponseResult {
+pub struct SessionTokenResponseResult {
     /// session token as string
-    #[serde(rename = "token", skip_serializing_if = "Option::is_none")]
-    pub token: Option<String>,
+    #[serde(rename = "token")]
+    pub token: String,
 }
 
-impl Login200ResponseResult {
-    pub fn new() -> Login200ResponseResult {
-        Login200ResponseResult {
-            token: None,
+impl SessionTokenResponseResult {
+    pub fn new(token: String) -> SessionTokenResponseResult {
+        SessionTokenResponseResult {
+            token,
         }
     }
 }

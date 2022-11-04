@@ -1,6 +1,6 @@
 # \PropertyApi
 
-All URIs are relative to *https://dss.int.schau.org:8080/json*
+All URIs are relative to *https://dss.acme.com:8080/json*
 
 Method | HTTP request | Description
 ------------- | ------------- | -------------
@@ -219,7 +219,7 @@ Name | Type | Description  | Required | Notes
 
 ## remove
 
-> crate::models::Subscribe200Response remove(path)
+> crate::models::Status remove(path)
 Removes a property node.
 
 ### Parameters
@@ -231,7 +231,7 @@ Name | Type | Description  | Required | Notes
 
 ### Return type
 
-[**crate::models::Subscribe200Response**](subscribe_200_response.md)
+[**crate::models::Status**](Status.md)
 
 ### Authorization
 
@@ -247,7 +247,7 @@ Name | Type | Description  | Required | Notes
 
 ## set_boolean
 
-> crate::models::Subscribe200Response set_boolean(path, value)
+> crate::models::Status set_boolean(path, value)
 Sets the boolean value of the property, this call will fail if the property is not of type ’boolean’.
 
 ### Parameters
@@ -260,7 +260,7 @@ Name | Type | Description  | Required | Notes
 
 ### Return type
 
-[**crate::models::Subscribe200Response**](subscribe_200_response.md)
+[**crate::models::Status**](Status.md)
 
 ### Authorization
 
@@ -276,7 +276,7 @@ Name | Type | Description  | Required | Notes
 
 ## set_flags
 
-> crate::models::Subscribe200Response set_flags(path, flag, value)
+> crate::models::Status set_flags(path, flag, value)
 Sets a given flag of a property.
 
 ### Parameters
@@ -290,7 +290,7 @@ Name | Type | Description  | Required | Notes
 
 ### Return type
 
-[**crate::models::Subscribe200Response**](subscribe_200_response.md)
+[**crate::models::Status**](Status.md)
 
 ### Authorization
 
@@ -306,7 +306,7 @@ Name | Type | Description  | Required | Notes
 
 ## set_integer
 
-> crate::models::Subscribe200Response set_integer(path, value)
+> crate::models::Status set_integer(path, value)
 Sets the integer value of the property, this call will fail if the property is not of type ’integer’.
 
 ### Parameters
@@ -319,7 +319,7 @@ Name | Type | Description  | Required | Notes
 
 ### Return type
 
-[**crate::models::Subscribe200Response**](subscribe_200_response.md)
+[**crate::models::Status**](Status.md)
 
 ### Authorization
 
@@ -335,7 +335,7 @@ Name | Type | Description  | Required | Notes
 
 ## set_string
 
-> crate::models::Subscribe200Response set_string(path, value)
+> crate::models::Status set_string(path, value)
 Sets the string value of the property, this call will fail if the property is not of type ’string’.
 
 ### Parameters
@@ -348,7 +348,7 @@ Name | Type | Description  | Required | Notes
 
 ### Return type
 
-[**crate::models::Subscribe200Response**](subscribe_200_response.md)
+[**crate::models::Status**](Status.md)
 
 ### Authorization
 

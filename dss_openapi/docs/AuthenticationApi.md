@@ -1,6 +1,6 @@
 # \AuthenticationApi
 
-All URIs are relative to *https://dss.int.schau.org:8080/json*
+All URIs are relative to *https://dss.acme.com:8080/json*
 
 Method | HTTP request | Description
 ------------- | ------------- | -------------
@@ -16,7 +16,7 @@ Method | HTTP request | Description
 
 ## enable_token
 
-> crate::models::Subscribe200Response enable_token(application_token)
+> crate::models::Status enable_token(application_token)
 Enables an application token, caller must be logged in.
 
 ### Parameters
@@ -28,7 +28,7 @@ Name | Type | Description  | Required | Notes
 
 ### Return type
 
-[**crate::models::Subscribe200Response**](subscribe_200_response.md)
+[**crate::models::Status**](Status.md)
 
 ### Authorization
 
@@ -37,7 +37,7 @@ Name | Type | Description  | Required | Notes
 ### HTTP request headers
 
 - **Content-Type**: Not defined
-- **Accept**: */*
+- **Accept**: application/json
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
@@ -62,14 +62,14 @@ This endpoint does not need any parameter.
 ### HTTP request headers
 
 - **Content-Type**: Not defined
-- **Accept**: */*
+- **Accept**: application/json
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 
 ## login
 
-> crate::models::Login200Response login(user, password)
+> crate::models::SessionTokenResponse login(user, password)
 Creates a new session using the provided credentials.
 
 ### Parameters
@@ -82,7 +82,7 @@ Name | Type | Description  | Required | Notes
 
 ### Return type
 
-[**crate::models::Login200Response**](login_200_response.md)
+[**crate::models::SessionTokenResponse**](SessionTokenResponse.md)
 
 ### Authorization
 
@@ -98,7 +98,7 @@ No authorization required
 
 ## login_application
 
-> crate::models::Login200Response login_application(login_token)
+> crate::models::SessionTokenResponse login_application(login_token)
 Creates a new session using the registered application token.
 
 ### Parameters
@@ -110,7 +110,7 @@ Name | Type | Description  | Required | Notes
 
 ### Return type
 
-[**crate::models::Login200Response**](login_200_response.md)
+[**crate::models::SessionTokenResponse**](SessionTokenResponse.md)
 
 ### Authorization
 
@@ -126,7 +126,7 @@ No authorization required
 
 ## logout
 
-> crate::models::Subscribe200Response logout()
+> crate::models::Status logout()
 Destroys the session and signs out the user.
 
 ### Parameters
@@ -135,7 +135,7 @@ This endpoint does not need any parameter.
 
 ### Return type
 
-[**crate::models::Subscribe200Response**](subscribe_200_response.md)
+[**crate::models::Status**](Status.md)
 
 ### Authorization
 
@@ -144,7 +144,7 @@ This endpoint does not need any parameter.
 ### HTTP request headers
 
 - **Content-Type**: Not defined
-- **Accept**: */*
+- **Accept**: application/json
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
@@ -179,7 +179,7 @@ No authorization required
 
 ## revoke_token
 
-> crate::models::Subscribe200Response revoke_token(application_token)
+> crate::models::Status revoke_token(application_token)
 Revokes an application token, caller must be logged in.
 
 ### Parameters
@@ -191,7 +191,7 @@ Name | Type | Description  | Required | Notes
 
 ### Return type
 
-[**crate::models::Subscribe200Response**](subscribe_200_response.md)
+[**crate::models::Status**](Status.md)
 
 ### Authorization
 
@@ -200,7 +200,7 @@ Name | Type | Description  | Required | Notes
 ### HTTP request headers
 
 - **Content-Type**: Not defined
-- **Accept**: */*
+- **Accept**: application/json
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 

@@ -33,6 +33,7 @@ pub enum TimeError {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(untagged)]
 pub enum VersionError {
+    Status403(crate::models::Status),
     UnknownValue(serde_json::Value),
 }
 

@@ -1,12 +1,10 @@
-# RequestApplicationToken200Response
+# SessionTokenResponseAllOf
 
 ## Properties
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**ok** | **bool** |  | 
-**message** | Option<**String**> |  | [optional]
-**result** | Option<[**crate::models::RequestApplicationToken200ResponseAllOfResult**](requestApplicationToken_200_response_allOf_result.md)> |  | [optional]
+**result** | Option<[**crate::models::SessionTokenResponseAllOfResult**](SessionTokenResponse_allOf_result.md)> |  | [optional]
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
 

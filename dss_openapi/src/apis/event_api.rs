@@ -19,6 +19,7 @@ use super::{Error, configuration};
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(untagged)]
 pub enum GetError {
+    Status403(crate::models::Status),
     UnknownValue(serde_json::Value),
 }
 
@@ -26,6 +27,7 @@ pub enum GetError {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(untagged)]
 pub enum SubscribeError {
+    Status403(crate::models::Status),
     UnknownValue(serde_json::Value),
 }
 
@@ -33,6 +35,7 @@ pub enum SubscribeError {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(untagged)]
 pub enum UnsubscribeError {
+    Status403(crate::models::Status),
     UnknownValue(serde_json::Value),
 }
 
@@ -76,7 +79,7 @@ pub async fn get(configuration: &configuration::Configuration, subscription_id: 
     }
 }
 
-pub async fn subscribe(configuration: &configuration::Configuration, name: &str, subscription_id: i32) -> Result<crate::models::Subscribe200Response, Error<SubscribeError>> {
+pub async fn subscribe(configuration: &configuration::Configuration, name: &str, subscription_id: i32) -> Result<crate::models::Status, Error<SubscribeError>> {
     let local_var_configuration = configuration;
 
     let local_var_client = &local_var_configuration.client;
@@ -113,7 +116,7 @@ pub async fn subscribe(configuration: &configuration::Configuration, name: &str,
     }
 }
 
-pub async fn unsubscribe(configuration: &configuration::Configuration, name: &str, subscription_id: i32) -> Result<crate::models::Subscribe200Response, Error<UnsubscribeError>> {
+pub async fn unsubscribe(configuration: &configuration::Configuration, name: &str, subscription_id: i32) -> Result<crate::models::Status, Error<UnsubscribeError>> {
     let local_var_configuration = configuration;
 
     let local_var_client = &local_var_configuration.client;

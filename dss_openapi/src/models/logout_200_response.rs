@@ -12,14 +12,14 @@
 
 
 #[derive(Clone, Debug, PartialEq, Default, Serialize, Deserialize)]
-pub struct Subscribe200Response {
+pub struct Logout200Response {
     #[serde(rename = "ok", skip_serializing_if = "Option::is_none")]
     pub ok: Option<bool>,
 }
 
-impl Subscribe200Response {
-    pub fn new() -> Subscribe200Response {
-        Subscribe200Response {
+impl Logout200Response {
+    pub fn new() -> Logout200Response {
+        Logout200Response {
             ok: None,
         }
     }

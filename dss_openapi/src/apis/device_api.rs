@@ -19,6 +19,7 @@ use super::{Error, configuration};
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(untagged)]
 pub enum DecreaseValueError {
+    Status403(crate::models::Status),
     UnknownValue(serde_json::Value),
 }
 
@@ -26,6 +27,7 @@ pub enum DecreaseValueError {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(untagged)]
 pub enum IncreaseValueError {
+    Status403(crate::models::Status),
     UnknownValue(serde_json::Value),
 }
 
@@ -33,6 +35,7 @@ pub enum IncreaseValueError {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(untagged)]
 pub enum TurnOffError {
+    Status403(crate::models::Status),
     UnknownValue(serde_json::Value),
 }
 
@@ -40,11 +43,12 @@ pub enum TurnOffError {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(untagged)]
 pub enum TurnOnError {
+    Status403(crate::models::Status),
     UnknownValue(serde_json::Value),
 }
 
 
-pub async fn decrease_value(configuration: &configuration::Configuration, dsid: &str) -> Result<crate::models::Subscribe200Response, Error<DecreaseValueError>> {
+pub async fn decrease_value(configuration: &configuration::Configuration, dsid: &str) -> Result<crate::models::Status, Error<DecreaseValueError>> {
     let local_var_configuration = configuration;
 
     let local_var_client = &local_var_configuration.client;
@@ -80,7 +84,7 @@ pub async fn decrease_value(configuration: &configuration::Configuration, dsid: 
     }
 }
 
-pub async fn increase_value(configuration: &configuration::Configuration, dsid: &str) -> Result<crate::models::Subscribe200Response, Error<IncreaseValueError>> {
+pub async fn increase_value(configuration: &configuration::Configuration, dsid: &str) -> Result<crate::models::Status, Error<IncreaseValueError>> {
     let local_var_configuration = configuration;
 
     let local_var_client = &local_var_configuration.client;
@@ -116,7 +120,7 @@ pub async fn increase_value(configuration: &configuration::Configuration, dsid: 
     }
 }
 
-pub async fn turn_off(configuration: &configuration::Configuration, dsid: &str) -> Result<crate::models::Subscribe200Response, Error<TurnOffError>> {
+pub async fn turn_off(configuration: &configuration::Configuration, dsid: &str) -> Result<crate::models::Status, Error<TurnOffError>> {
     let local_var_configuration = configuration;
 
     let local_var_client = &local_var_configuration.client;
@@ -152,7 +156,7 @@ pub async fn turn_off(configuration: &configuration::Configuration, dsid: &str) 
     }
 }
 
-pub async fn turn_on(configuration: &configuration::Configuration, dsid: &str) -> Result<crate::models::Subscribe200Response, Error<TurnOnError>> {
+pub async fn turn_on(configuration: &configuration::Configuration, dsid: &str) -> Result<crate::models::Status, Error<TurnOnError>> {
     let local_var_configuration = configuration;
 
     let local_var_client = &local_var_configuration.client;

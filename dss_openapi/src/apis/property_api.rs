@@ -19,6 +19,7 @@ use super::{Error, configuration};
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(untagged)]
 pub enum GetBooleanError {
+    Status403(crate::models::Status),
     UnknownValue(serde_json::Value),
 }
 
@@ -26,6 +27,7 @@ pub enum GetBooleanError {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(untagged)]
 pub enum GetChildrenError {
+    Status403(crate::models::Status),
     UnknownValue(serde_json::Value),
 }
 
@@ -33,6 +35,7 @@ pub enum GetChildrenError {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(untagged)]
 pub enum GetFlagsError {
+    Status403(crate::models::Status),
     UnknownValue(serde_json::Value),
 }
 
@@ -40,6 +43,7 @@ pub enum GetFlagsError {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(untagged)]
 pub enum GetIntegerError {
+    Status403(crate::models::Status),
     UnknownValue(serde_json::Value),
 }
 
@@ -47,6 +51,7 @@ pub enum GetIntegerError {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(untagged)]
 pub enum GetStringError {
+    Status403(crate::models::Status),
     UnknownValue(serde_json::Value),
 }
 
@@ -54,6 +59,7 @@ pub enum GetStringError {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(untagged)]
 pub enum GetTypeError {
+    Status403(crate::models::Status),
     UnknownValue(serde_json::Value),
 }
 
@@ -61,6 +67,7 @@ pub enum GetTypeError {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(untagged)]
 pub enum Query2Error {
+    Status403(crate::models::Status),
     UnknownValue(serde_json::Value),
 }
 
@@ -68,6 +75,7 @@ pub enum Query2Error {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(untagged)]
 pub enum RemoveError {
+    Status403(crate::models::Status),
     UnknownValue(serde_json::Value),
 }
 
@@ -75,6 +83,7 @@ pub enum RemoveError {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(untagged)]
 pub enum SetBooleanError {
+    Status403(crate::models::Status),
     UnknownValue(serde_json::Value),
 }
 
@@ -82,6 +91,7 @@ pub enum SetBooleanError {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(untagged)]
 pub enum SetFlagsError {
+    Status403(crate::models::Status),
     UnknownValue(serde_json::Value),
 }
 
@@ -89,6 +99,7 @@ pub enum SetFlagsError {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(untagged)]
 pub enum SetIntegerError {
+    Status403(crate::models::Status),
     UnknownValue(serde_json::Value),
 }
 
@@ -96,6 +107,7 @@ pub enum SetIntegerError {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(untagged)]
 pub enum SetStringError {
+    Status403(crate::models::Status),
     UnknownValue(serde_json::Value),
 }
 
@@ -353,7 +365,7 @@ pub async fn query2(configuration: &configuration::Configuration, query: &str) -
     }
 }
 
-pub async fn remove(configuration: &configuration::Configuration, path: &str) -> Result<crate::models::Subscribe200Response, Error<RemoveError>> {
+pub async fn remove(configuration: &configuration::Configuration, path: &str) -> Result<crate::models::Status, Error<RemoveError>> {
     let local_var_configuration = configuration;
 
     let local_var_client = &local_var_configuration.client;
@@ -389,7 +401,7 @@ pub async fn remove(configuration: &configuration::Configuration, path: &str) ->
     }
 }
 
-pub async fn set_boolean(configuration: &configuration::Configuration, path: &str, value: bool) -> Result<crate::models::Subscribe200Response, Error<SetBooleanError>> {
+pub async fn set_boolean(configuration: &configuration::Configuration, path: &str, value: bool) -> Result<crate::models::Status, Error<SetBooleanError>> {
     let local_var_configuration = configuration;
 
     let local_var_client = &local_var_configuration.client;
@@ -426,7 +438,7 @@ pub async fn set_boolean(configuration: &configuration::Configuration, path: &st
     }
 }
 
-pub async fn set_flags(configuration: &configuration::Configuration, path: &str, flag: &str, value: bool) -> Result<crate::models::Subscribe200Response, Error<SetFlagsError>> {
+pub async fn set_flags(configuration: &configuration::Configuration, path: &str, flag: &str, value: bool) -> Result<crate::models::Status, Error<SetFlagsError>> {
     let local_var_configuration = configuration;
 
     let local_var_client = &local_var_configuration.client;
@@ -464,7 +476,7 @@ pub async fn set_flags(configuration: &configuration::Configuration, path: &str,
     }
 }
 
-pub async fn set_integer(configuration: &configuration::Configuration, path: &str, value: i32) -> Result<crate::models::Subscribe200Response, Error<SetIntegerError>> {
+pub async fn set_integer(configuration: &configuration::Configuration, path: &str, value: i32) -> Result<crate::models::Status, Error<SetIntegerError>> {
     let local_var_configuration = configuration;
 
     let local_var_client = &local_var_configuration.client;
@@ -501,7 +513,7 @@ pub async fn set_integer(configuration: &configuration::Configuration, path: &st
     }
 }
 
-pub async fn set_string(configuration: &configuration::Configuration, path: &str, value: &str) -> Result<crate::models::Subscribe200Response, Error<SetStringError>> {
+pub async fn set_string(configuration: &configuration::Configuration, path: &str, value: &str) -> Result<crate::models::Status, Error<SetStringError>> {
     let local_var_configuration = configuration;
 
     let local_var_client = &local_var_configuration.client;

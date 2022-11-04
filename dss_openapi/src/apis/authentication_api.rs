@@ -19,6 +19,7 @@ use super::{Error, configuration};
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(untagged)]
 pub enum EnableTokenError {
+    Status403(crate::models::Status),
     UnknownValue(serde_json::Value),
 }
 
@@ -26,6 +27,7 @@ pub enum EnableTokenError {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(untagged)]
 pub enum LoggedInUserError {
+    Status403(crate::models::Status),
     UnknownValue(serde_json::Value),
 }
 
@@ -61,11 +63,12 @@ pub enum RequestApplicationTokenError {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(untagged)]
 pub enum RevokeTokenError {
+    Status403(crate::models::Status),
     UnknownValue(serde_json::Value),
 }
 
 
-pub async fn enable_token(configuration: &configuration::Configuration, application_token: &str) -> Result<crate::models::Subscribe200Response, Error<EnableTokenError>> {
+pub async fn enable_token(configuration: &configuration::Configuration, application_token: &str) -> Result<crate::models::Status, Error<EnableTokenError>> {
     let local_var_configuration = configuration;
 
     let local_var_client = &local_var_configuration.client;
@@ -136,7 +139,7 @@ pub async fn logged_in_user(configuration: &configuration::Configuration, ) -> R
     }
 }
 
-pub async fn login(configuration: &configuration::Configuration, user: &str, password: &str) -> Result<crate::models::Login200Response, Error<LoginError>> {
+pub async fn login(configuration: &configuration::Configuration, user: &str, password: &str) -> Result<crate::models::SessionTokenResponse, Error<LoginError>> {
     let local_var_configuration = configuration;
 
     let local_var_client = &local_var_configuration.client;
@@ -165,7 +168,7 @@ pub async fn login(configuration: &configuration::Configuration, user: &str, pas
     }
 }
 
-pub async fn login_application(configuration: &configuration::Configuration, login_token: &str) -> Result<crate::models::Login200Response, Error<LoginApplicationError>> {
+pub async fn login_application(configuration: &configuration::Configuration, login_token: &str) -> Result<crate::models::SessionTokenResponse, Error<LoginApplicationError>> {
     let local_var_configuration = configuration;
 
     let local_var_client = &local_var_configuration.client;
@@ -193,7 +196,7 @@ pub async fn login_application(configuration: &configuration::Configuration, log
     }
 }
 
-pub async fn logout(configuration: &configuration::Configuration, ) -> Result<crate::models::Subscribe200Response, Error<LogoutError>> {
+pub async fn logout(configuration: &configuration::Configuration, ) -> Result<crate::models::Status, Error<LogoutError>> {
     let local_var_configuration = configuration;
 
     let local_var_client = &local_var_configuration.client;
@@ -256,7 +259,7 @@ pub async fn request_application_token(configuration: &configuration::Configurat
     }
 }
 
-pub async fn revoke_token(configuration: &configuration::Configuration, application_token: &str) -> Result<crate::models::Subscribe200Response, Error<RevokeTokenError>> {
+pub async fn revoke_token(configuration: &configuration::Configuration, application_token: &str) -> Result<crate::models::Status, Error<RevokeTokenError>> {
     let local_var_configuration = configuration;
 
     let local_var_client = &local_var_configuration.client;

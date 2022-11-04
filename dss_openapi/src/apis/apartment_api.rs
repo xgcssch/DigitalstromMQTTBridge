@@ -19,6 +19,7 @@ use super::{Error, configuration};
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(untagged)]
 pub enum ApartmentCallSceneError {
+    Status403(crate::models::Status),
     UnknownValue(serde_json::Value),
 }
 
@@ -26,6 +27,7 @@ pub enum ApartmentCallSceneError {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(untagged)]
 pub enum GetStructureError {
+    Status403(crate::models::Status),
     UnknownValue(serde_json::Value),
 }
 
@@ -33,11 +35,12 @@ pub enum GetStructureError {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(untagged)]
 pub enum SetValueError {
+    Status403(crate::models::Status),
     UnknownValue(serde_json::Value),
 }
 
 
-pub async fn apartment_call_scene(configuration: &configuration::Configuration, scene_number: i32, group_id: Option<i32>, group_name: Option<&str>, force: Option<bool>) -> Result<crate::models::Subscribe200Response, Error<ApartmentCallSceneError>> {
+pub async fn apartment_call_scene(configuration: &configuration::Configuration, scene_number: i32, group_id: Option<i32>, group_name: Option<&str>, force: Option<bool>) -> Result<crate::models::Status, Error<ApartmentCallSceneError>> {
     let local_var_configuration = configuration;
 
     let local_var_client = &local_var_configuration.client;
@@ -117,7 +120,7 @@ pub async fn get_structure(configuration: &configuration::Configuration, ) -> Re
     }
 }
 
-pub async fn set_value(configuration: &configuration::Configuration, value: i32, group_id: Option<i32>, group_name: Option<&str>) -> Result<crate::models::Subscribe200Response, Error<SetValueError>> {
+pub async fn set_value(configuration: &configuration::Configuration, value: i32, group_id: Option<i32>, group_name: Option<&str>) -> Result<crate::models::Status, Error<SetValueError>> {
     let local_var_configuration = configuration;
 
     let local_var_client = &local_var_configuration.client;

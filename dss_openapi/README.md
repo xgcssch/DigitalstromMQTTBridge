@@ -21,7 +21,7 @@ dss_openapi = { path = "./dss_openapi" }
 
 ## Documentation for API Endpoints
 
-All URIs are relative to *https://dss.int.schau.org:8080/json*
+All URIs are relative to *https://dss.acme.com:8080/json*
 
 Class | Method | HTTP request | Description
 ------------ | ------------- | ------------- | -------------
@@ -93,12 +93,14 @@ Class | Method | HTTP request | Description
  - [GetType200ResponseResult](docs/GetType200ResponseResult.md)
  - [LoggedInUser200Response](docs/LoggedInUser200Response.md)
  - [LoggedInUser200ResponseResult](docs/LoggedInUser200ResponseResult.md)
- - [Login200Response](docs/Login200Response.md)
- - [Login200ResponseResult](docs/Login200ResponseResult.md)
  - [Query2200Response](docs/Query2200Response.md)
  - [RequestApplicationToken200Response](docs/RequestApplicationToken200Response.md)
- - [RequestApplicationToken200ResponseResult](docs/RequestApplicationToken200ResponseResult.md)
- - [Subscribe200Response](docs/Subscribe200Response.md)
+ - [RequestApplicationToken200ResponseAllOf](docs/RequestApplicationToken200ResponseAllOf.md)
+ - [RequestApplicationToken200ResponseAllOfResult](docs/RequestApplicationToken200ResponseAllOfResult.md)
+ - [SessionTokenResponse](docs/SessionTokenResponse.md)
+ - [SessionTokenResponseAllOf](docs/SessionTokenResponseAllOf.md)
+ - [SessionTokenResponseAllOfResult](docs/SessionTokenResponseAllOfResult.md)
+ - [Status](docs/Status.md)
  - [Time200Response](docs/Time200Response.md)
  - [Time200ResponseResult](docs/Time200ResponseResult.md)
  - [Version200Response](docs/Version200Response.md)

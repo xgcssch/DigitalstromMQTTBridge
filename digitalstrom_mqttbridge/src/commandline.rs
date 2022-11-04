@@ -45,4 +45,14 @@ pub enum Commands {
         #[arg(short, long, default_value_t = String::from("MQTT Bridge"))]
         application_name: String,
     },
+    /// Requests an Authentication Token from the dSS
+    Run {
+        #[arg(short, long)]
+        /// Url of dSS Server including protocol an optional port
+        mqttserver: String,
+
+        #[arg(short, long)]
+        /// Application Token to authorize to the dSS Server
+        application_token: String,
+    },
 }

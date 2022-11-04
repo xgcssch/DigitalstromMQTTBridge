@@ -1,6 +1,6 @@
 # \ZoneApi
 
-All URIs are relative to *https://dss.int.schau.org:8080/json*
+All URIs are relative to *https://dss.acme.com:8080/json*
 
 Method | HTTP request | Description
 ------------- | ------------- | -------------
@@ -10,7 +10,7 @@ Method | HTTP request | Description
 
 ## zone_call_scene
 
-> crate::models::Subscribe200Response zone_call_scene(scene_number, id, group_id, group_name, force)
+> crate::models::Status zone_call_scene(scene_number, id, group_id, group_name, force)
 Excutes the scene sceneNumber in a zone for a group of devices.
 
 ### Parameters
@@ -26,7 +26,7 @@ Name | Type | Description  | Required | Notes
 
 ### Return type
 
-[**crate::models::Subscribe200Response**](subscribe_200_response.md)
+[**crate::models::Status**](Status.md)
 
 ### Authorization
 

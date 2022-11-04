@@ -1,6 +1,6 @@
 # \ApartmentApi
 
-All URIs are relative to *https://dss.int.schau.org:8080/json*
+All URIs are relative to *https://dss.acme.com:8080/json*
 
 Method | HTTP request | Description
 ------------- | ------------- | -------------
@@ -12,7 +12,7 @@ Method | HTTP request | Description
 
 ## apartment_call_scene
 
-> crate::models::Subscribe200Response apartment_call_scene(scene_number, group_id, group_name, force)
+> crate::models::Status apartment_call_scene(scene_number, group_id, group_name, force)
 Excutes the scene sceneNumber on a group of devices.
 
 ### Parameters
@@ -27,7 +27,7 @@ Name | Type | Description  | Required | Notes
 
 ### Return type
 
-[**crate::models::Subscribe200Response**](subscribe_200_response.md)
+[**crate::models::Status**](Status.md)
 
 ### Authorization
 
@@ -68,7 +68,7 @@ This endpoint does not need any parameter.
 
 ## set_value
 
-> crate::models::Subscribe200Response set_value(value, group_id, group_name)
+> crate::models::Status set_value(value, group_id, group_name)
 Set the output value of a group of devices to a given value.
 
 ### Parameters
@@ -82,7 +82,7 @@ Name | Type | Description  | Required | Notes
 
 ### Return type
 
-[**crate::models::Subscribe200Response**](subscribe_200_response.md)
+[**crate::models::Status**](Status.md)
 
 ### Authorization
 

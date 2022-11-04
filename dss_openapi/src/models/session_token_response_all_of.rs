@@ -12,17 +12,14 @@
 
 
 #[derive(Clone, Debug, PartialEq, Default, Serialize, Deserialize)]
-pub struct Login200Response {
-    #[serde(rename = "ok", skip_serializing_if = "Option::is_none")]
-    pub ok: Option<bool>,
+pub struct SessionTokenResponseAllOf {
     #[serde(rename = "result", skip_serializing_if = "Option::is_none")]
-    pub result: Option<Box<crate::models::Login200ResponseResult>>,
+    pub result: Option<Box<crate::models::SessionTokenResponseAllOfResult>>,
 }
 
-impl Login200Response {
-    pub fn new() -> Login200Response {
-        Login200Response {
-            ok: None,
+impl SessionTokenResponseAllOf {
+    pub fn new() -> SessionTokenResponseAllOf {
+        SessionTokenResponseAllOf {
             result: None,
         }
     }
