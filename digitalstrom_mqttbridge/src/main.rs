@@ -1,4 +1,5 @@
 mod commandline;
+mod shutdown;
 
 extern crate dss_interface;
 extern crate dss_openapi;
@@ -10,10 +11,12 @@ extern crate slog_async;
 extern crate slog_term;
 
 use phf::phf_map;
-use slog::{b, error, info, o, Drain};
+use slog::{b, o, Drain};
+use tokio::{signal, sync::watch, time::sleep, time::Duration};
 
 use crate::commandline::{Cli, Messageformat};
 use clap::Parser;
+//use shutdown::Shutdown;
 
 struct Context {
     log: slog::Logger,
@@ -36,8 +39,9 @@ impl slog::KV for CombinedBorrowedKV<'_> {
 }
 
 impl Context {
-    fn logevent(&self, messageid: i32, kv: slog::BorrowedKV) {
-        let z = match messageid / 1000 {
+    fn logevent(&self, messageid: Messages, kv: slog::BorrowedKV) {
+        let numeric_messageid = messageid as i32;
+        let z = match numeric_messageid / 1000 {
             1 => (slog::Level::Error, 'E'),
             2 => (slog::Level::Warning, 'I'),
             3 => (slog::Level::Info, 'I'),
@@ -47,24 +51,32 @@ impl Context {
         let recs = slog::record_static!(z.0, "");
         self.log.log(&slog::Record::new(
             &recs,
-            &format_args!("{}{}: {}", z.1, messageid, ERRORMESSAGES[&messageid]),
+            &format_args!(
+                "{}{}: {}",
+                z.1, numeric_messageid, ERRORMESSAGES[&numeric_messageid]
+            ),
             b!(CombinedBorrowedKV {
                 k1: &kv,
-                k2: &b!("messageid"=>messageid),
+                k2: &b!("messageid"=>numeric_messageid ),
             }),
         ));
     }
 }
-//enum MyEnum {
-//    /// Startupmessage
-//    I3000 = 3000,
-//    B = 456,
-//}
+pub enum Messages {
+    /// Request to dSS Server returned HTTP Status 200, but 'ok' indicator was 'false'
+    E1000 = 1000,
+    /// Request to dSS Server failed
+    E1001 = 1001,
+    /// Startupmessage
+    I3000 = 3000,
+    /// Applicaton token successfully retrieved
+    I3001 = 3001,
+}
 static ERRORMESSAGES: phf::Map<i32, &'static str> = phf_map! {
+    1000i32 => "Request to dSS Server returned HTTP Status 200, but 'ok' indicator was 'false'",
+    1001i32 => "Request to dSS Server failed",
     3000i32 => concat!(env!("CARGO_PKG_NAME")," ", env!("CARGO_PKG_VERSION"), " - startup"),
-    2i32 => "apple",
-    3i32 => "apple",
-    4i32 => "request succeeded, but outcome was not ok",
+    3001i32 => "Applicaton token successfully retrieved",
 };
 #[tokio::main]
 async fn main() {
@@ -115,7 +127,7 @@ async fn main() {
     };
 
     context.logevent(
-        3000,
+        Messages::I3000,
         b!(
             "version_major"=>cargo_pkg_version_major,
             "version_minor"=>cargo_pkg_version_minor,
@@ -128,7 +140,45 @@ async fn main() {
         crate::commandline::Commands::Run {
             mqttserver: _,
             application_token: _,
-        } => {}
+        } => {
+            // ****************************************
+            // ****************************************
+
+            //let su = Shutdown::new();
+            //let (shutdown_send, shutdown_recv) = mpsc::unbounded_channel<int>();
+            //
+            let (tx, _) = watch::channel::<bool>(false);
+            let mut rx2 = tx.subscribe();
+            let tx2 = tx.
+            println!("Vor spawn");
+            let jh = tokio::spawn(async {
+                println!("Vor select in spawned task");
+                let mut rx3 = tx.subscribe();
+                tokio::select! {
+                    _ = sleep(Duration::from_millis(1000 * 60 * 5)) => {
+                        println!("sleep completed in spawn");
+                        tx.send(true);
+                    },
+                    _ = rx3.changed() => {
+                        println!("shutdown received in spawn");
+                    },
+                }
+                //sleep(Duration::from_millis(1000 * 60 * 1)).await;
+                println!("spawned task ending");
+            });
+            //
+            tokio::select! {
+                _ = signal::ctrl_c() => {
+                    println!("ctrl_c received");
+                    tx.send(true);
+                },
+                _ = rx2.changed() => {
+                    println!("Task ended");
+                },
+            }
+            jh.await;
+            println!("task joinded");
+        }
         crate::commandline::Commands::RequestApplicationToken { application_name } => {
             let result = dss_openapi::apis::authentication_api::request_application_token(
                 &context.configuration,
@@ -139,35 +189,29 @@ async fn main() {
                 Ok(response) => {
                     if !response.ok {
                         context.logevent(
-                            4,
+                            Messages::E1000,
                             b!(
                                 "api" => "request_application_token",
                                 "message" => response.message.unwrap_or(String::from("<unknown>")
                             )
                         ));
-                        //let recs = slog::record_static!(ERRORMESSAGES[&4].0, "");
-                        //context.log.log(&slog::Record::new(
-                        //    &recs,
-                        //    &format_args!("{}", ERRORMESSAGES[&4].1),
-                        //    b!("api" => "request_application_token","message" => response.message.unwrap_or(String::from("<unknown>")),"eventid"=>4),
-                        //));
                     } else {
                         let application_token = response.result.unwrap().application_token;
-                        info!(
-                            context.log,
-                            "retrieved token '{application_token}'",;
-                            "api" => "request_application_token",
-                            "eventid" => 3,"application_token"=>application_token.clone()
+                        context.logevent(
+                            Messages::I3001,
+                            b!(
+                                "api" => "request_application_token",
+                                "application_token"=>application_token.clone()                            )
                         );
                     }
                 }
                 Err(error) => {
-                    error!(
-                        context.log,
-                        "request_application_token request failed"
-                        ;
-                        "eventid" => 2,
-                        "error"=>%error
+                    context.logevent(
+                        Messages::E1001,
+                        b!(
+                            "api" => "request_application_token",
+                            "message" => format!("{}",error)
+                        ),
                     );
                 }
             }
