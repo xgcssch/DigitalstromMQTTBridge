@@ -1,5 +1,4 @@
 mod commandline;
-mod shutdown;
 
 extern crate dss_interface;
 extern crate dss_openapi;
@@ -13,9 +12,8 @@ extern crate slog_term;
 use crate::commandline::{Cli, Messageformat};
 use clap::Parser;
 use phf::phf_map;
-use rumqttc::{AsyncClient, Event, MqttOptions, Outgoing, Packet, QoS};
 use slog::{b, o, Drain};
-use tokio::{signal, sync::broadcast, time::Duration};
+use tokio::{signal, sync::broadcast};
 
 struct Context {
     log: slog::Logger,
@@ -112,7 +110,6 @@ async fn main() {
         .danger_accept_invalid_certs(true)
         .build();
     let dss_client = dss_client.unwrap();
-    //let dss_client = dss_client.unwraps(&d.unwrap());
 
     let context = Context {
         log: d.unwrap(),
@@ -138,55 +135,14 @@ async fn main() {
             mqttserver,
             application_token: _,
         } => {
-            // ****************************************
-            // ****************************************
-
-            let mut mqttoptions = MqttOptions::new(cargo_pkg_name, mqttserver, 1883);
-            mqttoptions.set_keep_alive(Duration::from_secs(5));
-
-            let (client, mut eventloop) = AsyncClient::new(mqttoptions, 10);
-
             let (tx, mut rx) = broadcast::channel::<bool>(1);
-            let mut rx2 = tx.subscribe();
-            let tx2 = tx.clone();
+            //let tx2 = tx.clone();
 
-            let jh = tokio::spawn(async move {
-                let mut shutdown_in_progress = false;
-                while !shutdown_in_progress {
-                    tokio::select! {
-                        _ = rx2.recv() => {
-                            shutdown_in_progress=true;
-                            println!("shutdown received in spawn");
-                        },
-                        notification = eventloop.poll() => {
-                            match notification {
-                                Ok(Event::Incoming(Packet::Publish(p))) => {
-                                        println!("Incoming = {:?}, {:?}", p.topic, p.payload);
-                                },
-                                Ok(Event::Incoming(Packet::PingResp)) |
-                                Ok(Event::Outgoing(Outgoing::PingReq)) => {},
-                                Ok(Event::Incoming(Packet::ConnAck(a))) => {
-                                    if a.code==rumqttc::ConnectReturnCode::Success {
-                                        client.subscribe("#", QoS::AtMostOnce).await.unwrap();
-                                    }
-                                },
-                                Ok(Event::Incoming(i)) => {
-                                    println!("Incoming = {:?}", i);
-                                },
-                                Ok(Event::Outgoing(o)) => {
-                                    println!("Outgoing = {:?}", o);
-                                },
-                                Err(e) => {
-                                    println!("Error = {:?}", e);
-                                }
-                            }
-                            //println!("Received = {:?}", notification);
-                        }
-                    }
-                }
-                //sleep(Duration::from_millis(1000 * 60 * 1)).await;
-                println!("spawned task ending");
-            });
+            let jh = dss_interface::run_mqtt_subscriptions(
+                &String::from(cargo_pkg_name),
+                mqttserver,
+                &tx,
+            );
             //
             tokio::select! {
                 _ = signal::ctrl_c() => {
