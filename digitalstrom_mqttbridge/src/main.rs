@@ -10,13 +10,12 @@ extern crate slog;
 extern crate slog_async;
 extern crate slog_term;
 
-use phf::phf_map;
-use slog::{b, o, Drain};
-use tokio::{signal, sync::watch, time::sleep, time::Duration};
-
 use crate::commandline::{Cli, Messageformat};
 use clap::Parser;
-//use shutdown::Shutdown;
+use phf::phf_map;
+use rumqttc::{AsyncClient, Event, MqttOptions, Outgoing, Packet, QoS};
+use slog::{b, o, Drain};
+use tokio::{signal, sync::broadcast, time::Duration};
 
 struct Context {
     log: slog::Logger,
@@ -109,8 +108,6 @@ async fn main() {
         }
     }
 
-    //let time_now = chrono::Utc::now();
-
     let dss_client = crate::reqwest::Client::builder()
         .danger_accept_invalid_certs(true)
         .build();
@@ -138,30 +135,54 @@ async fn main() {
 
     match &cli.command {
         crate::commandline::Commands::Run {
-            mqttserver: _,
+            mqttserver,
             application_token: _,
         } => {
             // ****************************************
             // ****************************************
 
-            //let su = Shutdown::new();
-            //let (shutdown_send, shutdown_recv) = mpsc::unbounded_channel<int>();
-            //
-            let (tx, _) = watch::channel::<bool>(false);
+            let mut mqttoptions = MqttOptions::new(cargo_pkg_name, mqttserver, 1883);
+            mqttoptions.set_keep_alive(Duration::from_secs(5));
+
+            let (client, mut eventloop) = AsyncClient::new(mqttoptions, 10);
+
+            let (tx, mut rx) = broadcast::channel::<bool>(1);
             let mut rx2 = tx.subscribe();
-            let tx2 = tx.
-            println!("Vor spawn");
-            let jh = tokio::spawn(async {
-                println!("Vor select in spawned task");
-                let mut rx3 = tx.subscribe();
-                tokio::select! {
-                    _ = sleep(Duration::from_millis(1000 * 60 * 5)) => {
-                        println!("sleep completed in spawn");
-                        tx.send(true);
-                    },
-                    _ = rx3.changed() => {
-                        println!("shutdown received in spawn");
-                    },
+            let tx2 = tx.clone();
+
+            let jh = tokio::spawn(async move {
+                let mut shutdown_in_progress = false;
+                while !shutdown_in_progress {
+                    tokio::select! {
+                        _ = rx2.recv() => {
+                            shutdown_in_progress=true;
+                            println!("shutdown received in spawn");
+                        },
+                        notification = eventloop.poll() => {
+                            match notification {
+                                Ok(Event::Incoming(Packet::Publish(p))) => {
+                                        println!("Incoming = {:?}, {:?}", p.topic, p.payload);
+                                },
+                                Ok(Event::Incoming(Packet::PingResp)) |
+                                Ok(Event::Outgoing(Outgoing::PingReq)) => {},
+                                Ok(Event::Incoming(Packet::ConnAck(a))) => {
+                                    if a.code==rumqttc::ConnectReturnCode::Success {
+                                        client.subscribe("#", QoS::AtMostOnce).await.unwrap();
+                                    }
+                                },
+                                Ok(Event::Incoming(i)) => {
+                                    println!("Incoming = {:?}", i);
+                                },
+                                Ok(Event::Outgoing(o)) => {
+                                    println!("Outgoing = {:?}", o);
+                                },
+                                Err(e) => {
+                                    println!("Error = {:?}", e);
+                                }
+                            }
+                            //println!("Received = {:?}", notification);
+                        }
+                    }
                 }
                 //sleep(Duration::from_millis(1000 * 60 * 1)).await;
                 println!("spawned task ending");
@@ -172,7 +193,7 @@ async fn main() {
                     println!("ctrl_c received");
                     tx.send(true);
                 },
-                _ = rx2.changed() => {
+                _ = rx.recv() => {
                     println!("Task ended");
                 },
             }
