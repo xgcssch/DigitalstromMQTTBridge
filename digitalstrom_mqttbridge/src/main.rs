@@ -99,8 +99,13 @@ async fn main() {
             _ = tokio::join!(mqtts, dsss);
         }
         crate::commandline::Commands::RequestApplicationToken { application_name } => {
+            let real_local_configuration: dss_openapi::apis::configuration::Configuration;
+            {
+                let locked_configuration = context.configuration().unwrap();
+                real_local_configuration = locked_configuration.clone();
+            }
             let result = dss_openapi::apis::authentication_api::request_application_token(
-                &context.configuration(),
+                &real_local_configuration,
                 application_name,
             )
             .await;
