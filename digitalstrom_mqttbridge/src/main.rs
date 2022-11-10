@@ -12,7 +12,7 @@ use std::sync::Arc;
 
 use crate::commandline::{Cli, Messageformat};
 use clap::Parser;
-use dss_interface::context::Messages;
+use dss_interface::messages::Messages;
 use slog::{b, o, Drain};
 use tokio::{signal, sync::broadcast};
 
@@ -141,4 +141,5 @@ async fn main() {
             }
         }
     }
+    context.logevent(Messages::I3002, b!());
 }

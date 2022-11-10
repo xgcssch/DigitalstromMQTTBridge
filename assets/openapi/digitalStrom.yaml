@@ -664,19 +664,19 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  ok:
-                    type: boolean
-                  result:
-                    type: object
+                allOf:
+                  - $ref: "#/components/schemas/Status"
+                  - type: object
                     properties:
-                      dSID:
-                        type: string
-                        description: dSID = SGTIN-96 of the dSS
-                      dSUID:
-                        type: string
-                        description: dSUID of the dSS
+                      result:
+                        type: object
+                        properties:
+                          dSID:
+                            type: string
+                            description: dSID = SGTIN-96 of the dSS
+                          dSUID:
+                            type: string
+                            description: dSUID of the dSS
   /system/login:
     get:
       tags:

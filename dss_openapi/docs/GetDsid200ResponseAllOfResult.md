@@ -1,12 +1,11 @@
-# GetDsid200Response
+# GetDsid200ResponseAllOfResult
 
 ## Properties
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**ok** | **bool** |  | 
-**message** | Option<**String**> |  | [optional]
-**result** | Option<[**crate::models::GetDsid200ResponseAllOfResult**](getDSID_200_response_allOf_result.md)> |  | [optional]
+**d_sid** | Option<**String**> | dSID = SGTIN-96 of the dSS | [optional]
+**d_suid** | Option<**String**> | dSUID of the dSS | [optional]
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
 

@@ -16,7 +16,8 @@ docs/GetBoolean200ResponseResult.md
 docs/GetChildren200Response.md
 docs/GetChildren200ResponseResultInner.md
 docs/GetDsid200Response.md
-docs/GetDsid200ResponseResult.md
+docs/GetDsid200ResponseAllOf.md
+docs/GetDsid200ResponseAllOfResult.md
 docs/GetFlags200Response.md
 docs/GetFlags200ResponseResult.md
 docs/GetInteger200Response.md
@@ -73,7 +74,8 @@ src/models/get_boolean_200_response_result.rs
 src/models/get_children_200_response.rs
 src/models/get_children_200_response_result_inner.rs
 src/models/get_dsid_200_response.rs
-src/models/get_dsid_200_response_result.rs
+src/models/get_dsid_200_response_all_of.rs
+src/models/get_dsid_200_response_all_of_result.rs
 src/models/get_flags_200_response.rs
 src/models/get_flags_200_response_result.rs
 src/models/get_integer_200_response.rs

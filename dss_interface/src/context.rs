@@ -2,13 +2,31 @@ extern crate phf;
 extern crate slog;
 
 use dss_openapi::apis::configuration::ApiKey;
-use phf::phf_map;
 use slog::b;
 use std::sync::{Arc, LockResult, RwLock, RwLockReadGuard};
+
+use crate::messages::Messages;
 
 pub struct Context {
     pub log: slog::Logger,
     configuration: Arc<RwLock<dss_openapi::apis::configuration::Configuration>>,
+}
+
+struct CombinedBorrowedKV<'a> {
+    k1: &'a slog::BorrowedKV<'a>,
+    k2: &'a slog::BorrowedKV<'a>,
+}
+
+impl slog::KV for CombinedBorrowedKV<'_> {
+    fn serialize(
+        &self,
+        record: &slog::Record,
+        serializer: &mut dyn slog::Serializer,
+    ) -> slog::Result {
+        self.k1.serialize(record, serializer)?;
+        self.k2.serialize(record, serializer)?;
+        Ok(())
+    }
 }
 
 impl Context {
@@ -36,7 +54,9 @@ impl Context {
             &recs,
             &format_args!(
                 "{}{}: {}",
-                z.1, numeric_messageid, ERRORMESSAGES[&numeric_messageid]
+                z.1,
+                numeric_messageid,
+                crate::messages::ERRORMESSAGES[&numeric_messageid]
             ),
             b!(CombinedBorrowedKV {
                 k1: &kv,
@@ -59,36 +79,3 @@ impl Context {
         &self.log
     }
 }
-struct CombinedBorrowedKV<'a> {
-    k1: &'a slog::BorrowedKV<'a>,
-    k2: &'a slog::BorrowedKV<'a>,
-}
-
-impl slog::KV for CombinedBorrowedKV<'_> {
-    fn serialize(
-        &self,
-        record: &slog::Record,
-        serializer: &mut dyn slog::Serializer,
-    ) -> slog::Result {
-        self.k1.serialize(record, serializer)?;
-        self.k2.serialize(record, serializer)?;
-        Ok(())
-    }
-}
-
-pub enum Messages {
-    /// Request to dSS Server returned HTTP Status 200, but 'ok' indicator was 'false'
-    E1000 = 1000,
-    /// Request to dSS Server failed
-    E1001 = 1001,
-    /// Startupmessage
-    I3000 = 3000,
-    /// Applicaton token successfully retrieved
-    I3001 = 3001,
-}
-static ERRORMESSAGES: phf::Map<i32, &'static str> = phf_map! {
-    1000i32 => "Request to dSS Server returned HTTP Status 200, but 'ok' indicator was 'false'",
-    1001i32 => "Request to dSS Server failed",
-    3000i32 => concat!(env!("CARGO_PKG_NAME")," ", env!("CARGO_PKG_VERSION"), " - startup"),
-    3001i32 => "Applicaton token successfully retrieved",
-};
