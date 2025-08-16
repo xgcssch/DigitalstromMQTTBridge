@@ -1,6 +1,4 @@
-//
 // Package dssinterface This file contains the
-//
 package dssinterface
 
 import (
@@ -20,7 +18,6 @@ import (
 	"github.com/at-wat/mqtt-go"
 	"github.com/davecgh/go-spew/spew"
 
-	"github.com/xgcssch/DigitalstromMQTTBridge/internal/pkg/swagger"
 	"k8s.io/klog/v2"
 )
 
