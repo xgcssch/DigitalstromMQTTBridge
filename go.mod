@@ -11,5 +11,5 @@ require (
 
 require (
 	github.com/go-logr/logr v0.2.0 // indirect
-	golang.org/x/net v0.0.0-20201031054903-ff519b6c9102 // indirect
+	golang.org/x/net v0.38.0 // indirect
 )
