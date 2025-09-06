@@ -16,3 +16,4 @@
 
 internal/pkg/swagger/
 .vscode/
+bin/
