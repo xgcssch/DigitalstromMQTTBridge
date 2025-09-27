@@ -24,7 +24,7 @@ ZoneId=Raum
 groupId=
 cluster=Gruppen
 
-SceneId
+SceneId (See 'digitalSTROM Light' - 3.2)
 0=Off
 5=On (Stimmung1)
 17=Stimmung2
@@ -62,7 +62,7 @@ https://homieiot.github.io/
 
 https://www.home-assistant.io/docs/mqtt/discovery/
 =>
-
+```json
 {
   "name": "Gosund-03",
   "stat_t": "tele/Gosund-03/STATE",
@@ -80,10 +80,12 @@ https://www.home-assistant.io/docs/mqtt/discovery/
     ]
   }
 }
+```
 
 cmnd/Gosund-03/POWER
 ON
 
+```json
 tele/Gosund-03/STATE
 {
   "Time": "2020-12-20T16:56:31",
@@ -106,12 +108,13 @@ tele/Gosund-03/STATE
     "Downtime": "0T00:00:06"
   }
 }
-
+```
 
 https://www.home-assistant.io/integrations/switch.mqtt/
 
 homeassistant/switch/dssBridge/3/config
 
+```json
 {
   "name": "Arbeitszimmer",
   "stat_t": "stat/dssBridge/group/3/1",
@@ -131,11 +134,13 @@ homeassistant/switch/dssBridge/3/config
     ]
   }
 }
+```
 
 https://www.home-assistant.io/integrations/device_trigger.mqtt/
 
 homeassistant/device_automation/dssBridge/303505d7f8000000000016800001f2d200_config
 
+```json
 {
   "automation_type": "trigger",
   "topic": "stat/dssBridge/switch/303505d7f8000000000016800001f2d200",
@@ -150,9 +155,11 @@ homeassistant/device_automation/dssBridge/303505d7f8000000000016800001f2d200_con
     "name": "Schalter Arbeitszimmer rechts-oben"
   }
 }
+```
 
 homeassistant/device_automation/dssBridge/303505d7f8000000000016800001d06f00/config
 
+```json
 {
   "automation_type": "trigger",
   "topic": "stat/dssBridge/switch/303505d7f8000000000016800001d06f00",
@@ -167,6 +174,7 @@ homeassistant/device_automation/dssBridge/303505d7f8000000000016800001d06f00/con
     "name": "Eingang links - unten - unten - rechts"
   }
 }
+```
 
 # Update GO Packages
 ```bash
