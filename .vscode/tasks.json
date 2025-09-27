@@ -1,0 +1,21 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"type": "shell",
+			"command": "./tasks/buildOpenApiStub.sh",
+			"args": [
+			],
+			"options": {
+				"shell": {
+					"executable": "/bin/bash",
+					"args": [
+						"-c"
+					]
+				},
+				"cwd": "${workspaceFolder}",
+			},
+			"label": "Build Go Stub from OpenAPI Spec",
+		}
+	]
+}

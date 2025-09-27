@@ -1,10 +1,14 @@
 #!/bin/bash
 
+set +x
+echo "Generating OpenAPI stub..."
+echo "========================"
+
 # Variables
-IMAGE_NAME="swaggerapi/swagger-codegen-cli"
-CONTAINER_NAME="openapi_stub_generator"
-OPENAPI_SPEC="./assets/swagger/digitalStrom.yaml"
-OUTPUT_DIR="./internal/pkg/swagger/"
+IMAGE_NAME=swaggerapi/swagger-codegen-cli
+CONTAINER_NAME=openapi_stub_generator
+OPENAPI_SPEC=assets/swagger/digitalStrom.yaml
+OUTPUT_DIR=internal/pkg/swagger/
 
 # Run Docker container to generate stub from OpenAPI spec
 docker run --rm \
