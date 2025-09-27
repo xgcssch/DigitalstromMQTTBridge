@@ -168,3 +168,8 @@ homeassistant/device_automation/dssBridge/303505d7f8000000000016800001d06f00/con
   }
 }
 
+# Update GO Packages
+```bash
+go get -u
+go mod tidy
+```

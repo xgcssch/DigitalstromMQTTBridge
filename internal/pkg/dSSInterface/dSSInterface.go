@@ -17,6 +17,7 @@ import (
 	"github.com/antihax/optional"
 	"github.com/at-wat/mqtt-go"
 	"github.com/davecgh/go-spew/spew"
+	"github.com/xgcssch/DigitalstromMQTTBridge/internal/pkg/swagger"
 
 	"k8s.io/klog/v2"
 )
@@ -283,7 +284,7 @@ func StartDssBridge(
 							Payload = fmt.Sprintf("{\"scene\": \"%s\"}", v.Properties.SceneID)
 							Retain = true
 						case "buttonClick":
-							Topic = Topic + "switch/" + fmt.Sprintf("%s", v.Source.Dsid)
+							Topic = Topic + "switch/" + v.Source.Dsid
 							Payload = fmt.Sprintf("{\"buttonIndex\": %s, \"clickType\": %s}", v.Properties.ButtonIndex, v.Properties.ClickType)
 						}
 						klog.V(2).Infof("Publishing Topic '%s' Payload '%s'", Topic, Payload)

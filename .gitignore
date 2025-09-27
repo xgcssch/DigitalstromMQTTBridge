@@ -16,3 +16,4 @@
 
 internal/pkg/swagger/
 bin/
+**/__debug*
