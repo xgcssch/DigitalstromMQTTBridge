@@ -4,7 +4,7 @@ COPY assets/swagger/digitalStrom.yaml /local/input/
 RUN mkdir /local/output/ && \
     java -jar /opt/swagger-codegen-cli/swagger-codegen-cli.jar generate -i "/local/input/digitalStrom.yaml" -l go -o "/local/output/"
 
-FROM mcr.microsoft.com/devcontainers/go:1-1.24-bookworm AS builder
+FROM mcr.microsoft.com/devcontainers/go:1-1.25-bookworm AS builder
 
 WORKDIR /go/app
 COPY . .
