@@ -455,7 +455,7 @@ all zones, groups and devices."
                                 type: object
                                 properties:
                                   id:
-                                    type: string
+                                    type: integer
                                   name:
                                     type: string
                                   applicationType:
