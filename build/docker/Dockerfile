@@ -8,7 +8,7 @@ COPY ./assets/swagger/digitalStrom.yaml /local/input/
 RUN mkdir /local/output/ && \
     java -jar /opt/swagger-codegen-cli/swagger-codegen-cli.jar generate -i "/local/input/digitalStrom.yaml" -l go -o "/local/output/"
 
-FROM golang:alpine as builder
+FROM golang:1.25-alpine as builder
 
 WORKDIR /go/app
 COPY . .
