@@ -15,4 +15,5 @@
 # vendor/
 
 internal/pkg/swagger/
-.vscode/
+bin/
+**/__debug*

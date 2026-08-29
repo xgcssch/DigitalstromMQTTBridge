@@ -1,6 +1,4 @@
-//
 // Package dssinterface This file contains the
-//
 package dssinterface
 
 import (
@@ -19,13 +17,41 @@ import (
 	"github.com/antihax/optional"
 	"github.com/at-wat/mqtt-go"
 	"github.com/davecgh/go-spew/spew"
-
 	"github.com/xgcssch/DigitalstromMQTTBridge/internal/pkg/swagger"
+
 	"k8s.io/klog/v2"
 )
 
 const messageReceiveTimeout = 120 * time.Second
 const debugmode = false
+
+// Backoff bounds used when a network operation (dSS or MQTT) fails. Instead of
+// terminating the process on a transient connectivity problem the bridge keeps
+// retrying, waiting a bit longer after every consecutive failure.
+const (
+	retryInitialWait = 2 * time.Second
+	retryMaxWait     = 60 * time.Second
+)
+
+// consecutiveEventFailures is the number of failed event polls that are
+// tolerated before the current dSS session is dropped and re-established.
+const consecutiveEventFailures = 3
+
+// retryWait blocks for the given backoff duration, returning early if ctx is
+// cancelled, and returns the next (doubled, capped) backoff value.
+func retryWait(ctx context.Context, current time.Duration) time.Duration {
+	t := time.NewTimer(current)
+	defer t.Stop()
+	select {
+	case <-ctx.Done():
+	case <-t.C:
+	}
+	next := current * 2
+	if next > retryMaxWait {
+		next = retryMaxWait
+	}
+	return next
+}
 
 type HomeassistantDevicesAdvertisment struct {
 	Ids []string `json:"ids"`
@@ -52,51 +78,83 @@ func publishHomeassistantAdvertisments(
 	MQTTClient mqtt.Client) {
 
 	for {
-		c1, _, _ := ac.ApartmentApi.GetStructure(ctx)
+		if zones, ok := readApartmentZones(ctx, ac); ok {
+			publishZoneAdvertisments(ctx, MQTTClient, zones)
+		}
 
-		for _, v := range c1.Result.Apartment.Zones {
-			if v.Id == 0 {
+		select {
+		case <-ctx.Done():
+			return
+		case <-time.After(time.Minute):
+		}
+	}
+}
+
+// readApartmentZones fetches the apartment structure from the dSS, returning
+// ok == false (instead of panicking or aborting the process) whenever the dSS
+// is unreachable or answers with an incomplete document.
+func readApartmentZones(
+	ctx context.Context,
+	ac swagger.APIClient) ([]swagger.InlineResponse2002ResultApartmentZones, bool) {
+
+	structure, _, err := ac.ApartmentApi.GetStructure(ctx)
+	if err != nil {
+		klog.Warningf("publishHomeassistantAdvertisments: unable to read structure from dSS: %v", err)
+		return nil, false
+	}
+	if structure.Result == nil || structure.Result.Apartment == nil {
+		klog.Warningf("publishHomeassistantAdvertisments: dSS returned an incomplete structure")
+		return nil, false
+	}
+	return structure.Result.Apartment.Zones, true
+}
+
+func publishZoneAdvertisments(
+	ctx context.Context,
+	MQTTClient mqtt.Client,
+	zones []swagger.InlineResponse2002ResultApartmentZones) {
+
+	for _, v := range zones {
+		if v.Id == 0 {
+			continue
+		}
+
+		for _, g := range v.Groups {
+			if (g.ApplicationType != 1) ||
+				v.Name == "" {
 				continue
 			}
 
-			for _, g := range v.Groups {
-				if (g.ApplicationType != 1) ||
-					v.Name == "" {
-					continue
-				}
-
-				uu := HomeassistantSwitchAdvertisment{
-					Name:       v.Name,
-					StatT:      fmt.Sprintf("stat/dssBridge/group/%d/%d", v.Id, g.ApplicationType),
-					AvtyT:      "tele/dssBridge/LWT",
-					PlAvail:    "Online",
-					PlNotAvail: "Offline",
-					CmdT:       fmt.Sprintf("cmnd/dssBridge/group/%d/%d", v.Id, g.ApplicationType),
-					ValTpl:     "{{value_json.scene}}",
-					PlOff:      "0",
-					PlOn:       "5",
-					StatOff:    "0",
-					StatOn:     "5",
-					UniqId:     fmt.Sprintf("dssBridge_%d_%d", v.Id, g.ApplicationType),
-					Dev: HomeassistantDevicesAdvertisment{
-						Ids: []string{fmt.Sprintf("dssBridge_%d_%d", v.Id, g.ApplicationType)}},
-				}
-
-				pl, _ := json.Marshal(uu)
-				// Publish on Last Will Topic that we are Online
-				if err := MQTTClient.Publish(ctx, &mqtt.Message{
-					Topic:   fmt.Sprintf("homeassistant/switch/dssBridge/%d_%d/config", v.Id, g.ApplicationType),
-					QoS:     mqtt.QoS1,
-					Payload: pl,
-					Retain:  false,
-				}); err != nil {
-					klog.Exitf("MQTTClient.Publish - Error: %v", err)
-				}
-
-				klog.V(3).Infof("Published Homeassistant discovery info for Zone %d: %s", v.Id, v.Name)
+			uu := HomeassistantSwitchAdvertisment{
+				Name:       v.Name,
+				StatT:      fmt.Sprintf("stat/dssBridge/group/%d/%d", v.Id, g.ApplicationType),
+				AvtyT:      "tele/dssBridge/LWT",
+				PlAvail:    "Online",
+				PlNotAvail: "Offline",
+				CmdT:       fmt.Sprintf("cmnd/dssBridge/group/%d/%d", v.Id, g.ApplicationType),
+				ValTpl:     "{{value_json.scene}}",
+				PlOff:      "0",
+				PlOn:       "5",
+				StatOff:    "0",
+				StatOn:     "5",
+				UniqId:     fmt.Sprintf("dssBridge_%d_%d", v.Id, g.ApplicationType),
+				Dev: HomeassistantDevicesAdvertisment{
+					Ids: []string{fmt.Sprintf("dssBridge_%d_%d", v.Id, g.ApplicationType)}},
 			}
+
+			pl, _ := json.Marshal(uu)
+			if err := MQTTClient.Publish(ctx, &mqtt.Message{
+				Topic:   fmt.Sprintf("homeassistant/switch/dssBridge/%d_%d/config", v.Id, g.ApplicationType),
+				QoS:     mqtt.QoS1,
+				Payload: pl,
+				Retain:  false,
+			}); err != nil {
+				klog.Warningf("publishHomeassistantAdvertisments: MQTT publish failed: %v", err)
+				return
+			}
+
+			klog.V(3).Infof("Published Homeassistant discovery info for Zone %d: %s", v.Id, v.Name)
 		}
-		time.Sleep(time.Minute)
 	}
 }
 
@@ -172,20 +230,30 @@ func StartDssBridge(
 
 		//
 		go func() {
-			_, err = MQTTClient.Connect(BaseContext,
-				"DigitalstromBridge", // Client ID
-				mqtt.WithKeepAlive(30),
-				mqtt.WithWill(
-					&mqtt.Message{
-						Topic:   "tele/dssBridge/LWT",
-						QoS:     mqtt.QoS1,
-						Payload: []byte("Offline"),
-						Retain:  true,
-					},
-				))
-			if err != nil {
-				klog.Errorf("%v", err)
-				os.Exit(1)
+			// Establish the first connection to the MQTT broker. A broker that is
+			// not reachable yet is not fatal - keep retrying with backoff so the
+			// bridge comes up on its own once the network is back.
+			connectWait := retryInitialWait
+			for {
+				_, connErr := MQTTClient.Connect(BaseContext,
+					"DigitalstromBridge", // Client ID
+					mqtt.WithKeepAlive(30),
+					mqtt.WithWill(
+						&mqtt.Message{
+							Topic:   "tele/dssBridge/LWT",
+							QoS:     mqtt.QoS1,
+							Payload: []byte("Offline"),
+							Retain:  true,
+						},
+					))
+				if connErr == nil {
+					break
+				}
+				if BaseContext.Err() != nil {
+					return
+				}
+				klog.Warningf("Unable to connect to MQTT server: %v (retrying in %s)", connErr, connectWait)
+				connectWait = retryWait(BaseContext, connectWait)
 			}
 
 			// Publish on Last Will Topic that we are Online
@@ -195,7 +263,7 @@ func StartDssBridge(
 				Payload: []byte("Online"),
 				Retain:  true,
 			}); err != nil {
-				klog.Exitf("MQTTClient.Publish - Error: %v", err)
+				klog.Warningf("MQTTClient.Publish (LWT Online) failed: %v", err)
 			}
 
 			mux := &mqtt.ServeMux{} // Multiplex message handlers by topic name.
@@ -224,29 +292,46 @@ func StartDssBridge(
 				}),
 			)
 
-			// Subscribe two topics.
-			if err := MQTTClient.Subscribe(BaseContext,
-				mqtt.Subscription{
-					Topic: "cmnd/dssBridge/#",
-					QoS:   mqtt.QoS1,
-				},
-			); err != nil {
-				klog.Exitf("Error: %v", err)
+			// Subscribe to the command topic. Retry with backoff instead of
+			// terminating if the broker is temporarily unavailable.
+			subscribeWait := retryInitialWait
+			for {
+				_, subErr := MQTTClient.Subscribe(BaseContext,
+					mqtt.Subscription{
+						Topic: "cmnd/dssBridge/#",
+						QoS:   mqtt.QoS1,
+					},
+				)
+				if subErr == nil {
+					break
+				}
+				if BaseContext.Err() != nil {
+					return
+				}
+				klog.Warningf("Unable to subscribe to command topic: %v (retrying in %s)", subErr, subscribeWait)
+				subscribeWait = retryWait(BaseContext, subscribeWait)
 			}
 
-			for {
+			loginWait := retryInitialWait
+			for BaseContext.Err() == nil {
 				b1, _, b3 := ac.AuthenticationApi.Login(BaseContext, configuration.Username, configuration.Password)
 
-				if b3 != nil {
-					klog.V(3).Infof("Authentication result=%s (%s)", b1.Result, b3)
+				if b3 != nil || !b1.Ok || b1.Result == nil {
+					// A failed login is most commonly caused by the dSS being
+					// unreachable. Do not give up - wait and try again.
+					klog.Warningf("Authentication for user '%s' on dSS '%s' failed: %v (retrying in %s)",
+						configuration.Username, configuration.BaseURL, b3, loginWait)
+					loginWait = retryWait(BaseContext, loginWait)
+					continue
 				}
-				if !b1.Ok {
-					klog.Exitf("Authentication request for user '%s' on dSS '%s' failed", configuration.Username, configuration.BaseURL)
-					cancel()
-				}
-				// Insert authentication Data into context
+				klog.V(3).Infof("Authenticated on dSS '%s'", configuration.BaseURL)
+
+				// Build a context that carries the freshly obtained session token
+				// and is cancelled as soon as this session ends (token expiry or
+				// connectivity loss), so goroutines tied to it stop as well.
+				SessionContext, endSession := context.WithCancel(BaseContext)
 				*AuthenticatedContext = context.WithValue(
-					BaseContext,
+					SessionContext,
 					swagger.ContextAPIKey,
 					swagger.APIKey{Key: b1.Result.Token})
 
@@ -257,10 +342,20 @@ func StartDssBridge(
 					*ac,
 					MQTTClient)
 
-				_, _, _ = ac.EventApi.Subscribe(*AuthenticatedContext, "callScene", SubscriptionID)
-				_, _, _ = ac.EventApi.Subscribe(*AuthenticatedContext, "buttonClick", SubscriptionID)
+				if _, _, err := ac.EventApi.Subscribe(*AuthenticatedContext, "callScene", SubscriptionID); err != nil {
+					klog.Warningf("Event subscription 'callScene' failed: %v", err)
+				}
+				if _, _, err := ac.EventApi.Subscribe(*AuthenticatedContext, "buttonClick", SubscriptionID); err != nil {
+					klog.Warningf("Event subscription 'buttonClick' failed: %v", err)
+				}
 
-				for {
+				// Event receive loop for the current session. After a number of
+				// consecutive failures the session is dropped and rebuilt (fresh
+				// login and subscription).
+				eventFailures := 0
+				eventWait := retryInitialWait
+				sessionHadSuccess := false
+				for BaseContext.Err() == nil {
 					ev, _, err := ac.EventApi.Get(
 						*AuthenticatedContext,
 						SubscriptionID,
@@ -268,7 +363,27 @@ func StartDssBridge(
 							Timeout: optional.NewInt32(
 								int32(messageReceiveTimeout.Milliseconds()) - 2000)})
 
-					if err != nil || !ev.Ok || len(ev.Result.Events) < 1 {
+					if err != nil {
+						eventFailures++
+						klog.Warningf("Receiving events from dSS failed (attempt %d/%d): %v",
+							eventFailures, consecutiveEventFailures, err)
+						if eventFailures >= consecutiveEventFailures {
+							break
+						}
+						eventWait = retryWait(BaseContext, eventWait)
+						continue
+					}
+					if !ev.Ok || ev.Result == nil {
+						klog.Warningf("dSS reported the event subscription as invalid - re-authenticating")
+						break
+					}
+
+					// Successful poll - reset the failure tracking.
+					eventFailures = 0
+					eventWait = retryInitialWait
+					sessionHadSuccess = true
+
+					if len(ev.Result.Events) < 1 {
 						continue
 					}
 
@@ -286,7 +401,7 @@ func StartDssBridge(
 							Payload = fmt.Sprintf("{\"scene\": \"%s\"}", v.Properties.SceneID)
 							Retain = true
 						case "buttonClick":
-							Topic = Topic + "switch/" + fmt.Sprintf("%s", v.Source.Dsid)
+							Topic = Topic + "switch/" + v.Source.Dsid
 							Payload = fmt.Sprintf("{\"buttonIndex\": %s, \"clickType\": %s}", v.Properties.ButtonIndex, v.Properties.ClickType)
 						}
 						klog.V(2).Infof("Publishing Topic '%s' Payload '%s'", Topic, Payload)
@@ -296,9 +411,25 @@ func StartDssBridge(
 							Payload: []byte(Payload),
 							Retain:  Retain,
 						}); err != nil {
-							klog.Exitf("MQTTClient.Publish - Error: %v", err)
+							klog.Warningf("MQTTClient.Publish - Error: %v", err)
 						}
 					}
+				}
+
+				// The session ended (connectivity loss or invalid token). Cancel
+				// the session context so the discovery goroutine stops, then loop
+				// around to authenticate again.
+				endSession()
+
+				if sessionHadSuccess {
+					// A healthy session just dropped - reconnect promptly.
+					loginWait = retryInitialWait
+				} else {
+					// We could authenticate but never received a single event;
+					// something is still wrong. Back off before trying again to
+					// avoid a tight re-login loop.
+					klog.Warningf("dSS session ended without receiving any event (retrying in %s)", loginWait)
+					loginWait = retryWait(BaseContext, loginWait)
 				}
 
 				//_, _, _ = ac.AuthenticationApi.Logout(AuthenticatedContext)

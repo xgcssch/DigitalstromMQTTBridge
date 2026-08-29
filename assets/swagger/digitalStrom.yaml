@@ -1115,31 +1115,31 @@ all zones, groups and devices."
             properties:
               ok:
                 type: "boolean"
-  /property/query2:
-    get:
-      security:
-        - api_key: []
-      tags:
-      - "Property"
-      summary: "Returns a part of the tree specified by query."
-      operationId: "query2"
-      description: "All queries start from the root. The properties to be included have to be put in parentheses. A query to get all device from zone4 would look like this: ’/apartment/ zones/zone4/*(ZoneID,name)’. More complex combinations (see example below) are also possible."
-      produces:
-      - "application/json"
-      parameters:
-        - in: query
-          name: query
-          type: string
-          required: true
-          description: "query string"
-      responses:
-        "200":
-          description: "successfully executed query"
-          schema:
-            type: "object"
-            properties:
-              ok:
-                type: "boolean"
-              result:
-                type: object
-                additionalProperties: true
+  #/property/query2:
+  #  get:
+  #    security:
+  #      - api_key: []
+  #    tags:
+  #    - "Property"
+  #    summary: "Returns a part of the tree specified by query."
+  #    operationId: "query2"
+  #    description: "All queries start from the root. The properties to be included have to be put in parentheses. A query to get all device from zone4 would look like this: ’/apartment/ zones/zone4/*(ZoneID,name)’. More complex combinations (see example below) are also possible."
+  #    produces:
+  #    - "application/json"
+  #    parameters:
+  #      - in: query
+  #        name: query
+  #        type: string
+  #        required: true
+  #        description: "query string"
+  #    responses:
+  #      "200":
+  #        description: "successfully executed query"
+  #        schema:
+  #          type: "object"
+  #          properties:
+  #            ok:
+  #              type: "boolean"
+  #            result:
+  #              type: object
+  #              additionalProperties: true
