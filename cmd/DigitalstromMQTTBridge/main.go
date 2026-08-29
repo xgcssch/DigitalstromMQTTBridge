@@ -21,7 +21,7 @@ func main() {
 	klog.InitFlags(nil)
 	flag.Parse()
 
-	klog.Info("DigitalstromBridge v0.1.1 starting")
+	klog.Info("DigitalstromBridge v0.1.2 starting")
 
 	Configuration := internal.DssBridgeConfiguration{
 		BaseURL:  *baseURL,
