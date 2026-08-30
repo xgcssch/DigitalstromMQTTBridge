@@ -4,6 +4,10 @@ set +x
 echo "Generating OpenAPI stub..."
 echo "========================"
 
+# Always operate relative to the repository root, regardless of the caller's
+# working directory (this lets the script be invoked via `go generate` too).
+cd "$(dirname "${BASH_SOURCE[0]}")/.."
+
 # Variables
 IMAGE_NAME=swaggerapi/swagger-codegen-cli
 CONTAINER_NAME=openapi_stub_generator

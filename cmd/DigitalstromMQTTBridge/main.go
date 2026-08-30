@@ -4,6 +4,8 @@
 
 package main
 
+//go:generate ../../tasks/buildOpenApiStub.sh
+
 import (
 	"flag"
 
